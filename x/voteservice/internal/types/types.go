@@ -6,6 +6,29 @@ import (
 	"strings"
 )
 
+type Agenda struct {
+	AgendaProposer sdk.AccAddress `json:"agenda-proposer"`
+	AgendaKey      uint64         `json:"agenda-key"`
+	AgendaContent  string         `json:"agenda-content"`
+
+	Voters   []string `json:"voters"`
+	ProCount uint32   `json:"pro-count"`
+	NegCount uint32   `json:"neg-count"`
+}
+
+func NewAgenda() Agenda {
+	return Agenda{}
+}
+
+func (a Agenda) String() string {
+	return strings.TrimSpace(fmt.Sprintf(`AgendaProposer: %s
+AgendaKey: %d
+AgendaContent: %s
+Voters: %v
+ProCount: %d
+NegCount: %d`, a.AgendaProposer, a.AgendaKey, a.AgendaContent, a.Voters, a.ProCount, a.NegCount))
+}
+
 // Whois is a struct that contains all the metadata of a name
 type Whois struct {
 	Value string         `json:"value"`
