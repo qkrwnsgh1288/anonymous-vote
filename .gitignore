@@ -1,0 +1,17 @@
+# OS
+.DS_Store
+*.swp
+*.swo
+.vscode
+.idea
+.xml
+
+# Build
+vendor
+.vendor-new
+build
+
+# IDE
+.idea
+*.iml
+test
