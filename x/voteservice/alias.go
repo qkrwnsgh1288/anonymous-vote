@@ -27,7 +27,7 @@ type (
 	MsgSetName    = types.MsgSetName
 	MsgBuyName    = types.MsgBuyName
 	MsgDeleteName = types.MsgDeleteName
-	MsgAgenda     = types.MsgAgenda
+	MsgAgenda     = types.MsgMakeAgenda
 
 	QueryResResolve = types.QueryResResolve
 	QueryResNames   = types.QueryResNames

@@ -103,38 +103,34 @@ func (msg MsgDeleteName) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Owner}
 }
 
-// 1. Agenda
-type MsgAgenda struct {
+// 1. MakeAgenda
+type MsgMakeAgenda struct {
 	AgendaProposer sdk.AccAddress `json:"agenda-proposer"`
-	AgendaKey      uint64         `json:"agenda-key"`
+	AgendaTopic    string         `json:"agenda-topic"`
 	AgendaContent  string         `json:"agenda-content"`
-
-	Voters   []string `json:"voters"`
-	ProCount uint32   `json:"pro-count"`
-	NegCount uint32   `json:"neg-count"`
 }
 
-func NewMsgAgenda(agendaProposer sdk.AccAddress, agendaKey uint64, agendaContent string) MsgAgenda {
-	return MsgAgenda{
+func NewMsgAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaContent string) MsgMakeAgenda {
+	return MsgMakeAgenda{
 		AgendaProposer: agendaProposer,
-		AgendaKey:      agendaKey,
+		AgendaTopic:    agendaTopic,
 		AgendaContent:  agendaContent,
 	}
 }
-func (msg MsgAgenda) Route() string { return RouterKey }
-func (msg MsgAgenda) Type() string  { return "agenda" }
-func (msg MsgAgenda) ValidateBasic() sdk.Error {
-	if msg.AgendaKey == 0 {
-		return sdk.ErrInternal("AgendaTopic cannot be 0")
+func (msg MsgMakeAgenda) Route() string { return RouterKey }
+func (msg MsgMakeAgenda) Type() string  { return "make_agenda" }
+func (msg MsgMakeAgenda) ValidateBasic() sdk.Error {
+	if len(msg.AgendaTopic) == 0 {
+		return sdk.ErrInternal("AgendaTopic cannot be empty")
 	}
 	if len(msg.AgendaContent) == 0 {
 		return sdk.ErrUnknownRequest("AgendaContent cannot be empty")
 	}
 	return nil
 }
-func (msg MsgAgenda) GetSignBytes() []byte {
+func (msg MsgMakeAgenda) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
-func (msg MsgAgenda) GetSigners() []sdk.AccAddress {
+func (msg MsgMakeAgenda) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.AgendaProposer}
 }

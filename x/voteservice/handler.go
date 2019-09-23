@@ -66,6 +66,6 @@ func handleMsgDeleteName(ctx sdk.Context, keeper Keeper, msg MsgDeleteName) sdk.
 	return sdk.Result{}
 }
 
-//func handleMsgAgenda(ctx sdk.Context, keeper Keeper, msg MsgAgenda) sdk.Result {
+//func handleMsgAgenda(ctx sdk.Context, keeper Keeper, msg MsgMakeAgenda) sdk.Result {
 //
 //}
