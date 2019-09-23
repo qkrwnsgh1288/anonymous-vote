@@ -125,7 +125,7 @@ func (msg MsgAgenda) Route() string { return RouterKey }
 func (msg MsgAgenda) Type() string  { return "agenda" }
 func (msg MsgAgenda) ValidateBasic() sdk.Error {
 	if msg.AgendaKey == 0 {
-		return sdk.ErrInternal("AgendaKey cannot be 0")
+		return sdk.ErrInternal("AgendaTopic cannot be 0")
 	}
 	if len(msg.AgendaContent) == 0 {
 		return sdk.ErrUnknownRequest("AgendaContent cannot be empty")

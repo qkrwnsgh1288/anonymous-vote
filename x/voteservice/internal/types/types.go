@@ -8,7 +8,7 @@ import (
 
 type Agenda struct {
 	AgendaProposer sdk.AccAddress `json:"agenda-proposer"`
-	AgendaKey      uint64         `json:"agenda-key"`
+	AgendaTopic    string         `json:"agenda-topic"`
 	AgendaContent  string         `json:"agenda-content"`
 
 	Voters   []string `json:"voters"`
@@ -22,11 +22,11 @@ func NewAgenda() Agenda {
 
 func (a Agenda) String() string {
 	return strings.TrimSpace(fmt.Sprintf(`AgendaProposer: %s
-AgendaKey: %d
+AgendaTopic: %s
 AgendaContent: %s
 Voters: %v
 ProCount: %d
-NegCount: %d`, a.AgendaProposer, a.AgendaKey, a.AgendaContent, a.Voters, a.ProCount, a.NegCount))
+NegCount: %d`, a.AgendaProposer, a.AgendaTopic, a.AgendaContent, a.Voters, a.ProCount, a.NegCount))
 }
 
 // Whois is a struct that contains all the metadata of a name
