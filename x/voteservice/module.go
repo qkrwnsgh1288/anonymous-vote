@@ -77,12 +77,6 @@ func NewAppModule(k Keeper, bankKeeper bank.Keeper) AppModule {
 	}
 }
 
-//func NewAppModuleVote(vk VoteKeeper) AppModule {
-//	return AppModule{
-//		AppModuleBasic: AppModuleBasic{},
-//		keeper:         vk,
-//	}
-//}
 func (AppModule) Name() string {
 	return ModuleName
 }

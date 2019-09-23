@@ -87,7 +87,6 @@ type nameServiceApp struct {
 	supplyKeeper   supply.Keeper
 	paramsKeeper   params.Keeper
 	nsKeeper       voteservice.Keeper
-	voteKeeper     voteservice.VoteKeeper
 
 	// Module Manager
 	mm *module.Manager
@@ -192,7 +191,7 @@ func NewNameServiceApp(
 	// The NameserviceKeeper is the Keeper from the module for this tutorial
 	// It handles interactions with the namestore
 	app.nsKeeper = voteservice.NewKeeper(
-		app.bankKeeper,
+		//app.bankKeeper,
 		keys[voteservice.StoreKey],
 		app.cdc,
 	)
