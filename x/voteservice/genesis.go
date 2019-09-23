@@ -7,23 +7,23 @@ import (
 )
 
 type GenesisState struct {
-	WhoisRecords []Whois `json:"whois_records"`
+	AgendaRecords []Agenda `json:"agenda_records"`
 }
 
-func NewGenesisState(whoIsRecords []Whois) GenesisState {
-	return GenesisState{WhoisRecords: nil}
+func NewGenesisState(agendaRecords []Agenda) GenesisState {
+	return GenesisState{AgendaRecords: nil}
 }
 
 func ValidateGenesis(data GenesisState) error {
-	for _, record := range data.WhoisRecords {
-		if record.Owner == nil {
-			return fmt.Errorf("Invalid WhoisRecord: Value: %s. Error: Missing Owner", record.Value)
+	for _, record := range data.AgendaRecords {
+		if record.AgendaProposer == nil {
+			return fmt.Errorf("Invalid AgendaRecord: AgendaProposer: %s. Error: Missing AgendaProposer", record.AgendaProposer)
 		}
-		if record.Value == "" {
-			return fmt.Errorf("Invalid WhoisRecord: Owner: %s. Error: Missing Value", record.Owner)
+		if record.AgendaTopic == "" {
+			return fmt.Errorf("Invalid AgendaRecord: AgendaTopic: %s. Error: Missing AgendaTopic", record.AgendaTopic)
 		}
-		if record.Price == nil {
-			return fmt.Errorf("Invalid WhoisRecord: Value: %s. Error: Missing Price", record.Value)
+		if record.AgendaContent == "" {
+			return fmt.Errorf("Invalid AgendaRecord: AgendaContent: %s. Error: Missing AgendaContent", record.AgendaContent)
 		}
 	}
 	return nil
@@ -31,24 +31,24 @@ func ValidateGenesis(data GenesisState) error {
 
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		WhoisRecords: []Whois{},
+		AgendaRecords: []Agenda{},
 	}
 }
 
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) []abci.ValidatorUpdate {
-	for _, record := range data.WhoisRecords {
-		keeper.SetWhois(ctx, record.Value, record)
+	for _, record := range data.AgendaRecords {
+		keeper.SetAgenda(ctx, record.AgendaTopic, record)
 	}
 	return []abci.ValidatorUpdate{}
 }
 
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
-	var records []Whois
-	iterator := k.GetNamesIterator(ctx)
+	var records []Agenda
+	iterator := k.GetTopicsIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
-		name := string(iterator.Key())
-		whois := k.GetWhois(ctx, name)
-		records = append(records, whois)
+		topic := string(iterator.Key())
+		agenda := k.GetAgenda(ctx, topic)
+		records = append(records, agenda)
 	}
-	return GenesisState{WhoisRecords: records}
+	return GenesisState{AgendaRecords: records}
 }
