@@ -23,6 +23,17 @@ func NewHandler(keeper Keeper) sdk.Handler {
 		}
 	}
 }
+func NewVoteHandler(votekeeper VoteKeeper) sdk.Handler {
+	return func(ctx sdk.Context, msg sdk.Msg) sdk.Result {
+		switch msg := msg.(type) {
+		case MsgMakeAgenda:
+			return handleMsgMakeAgenda(ctx, votekeeper, msg)
+		default:
+			errMsg := fmt.Sprintf("Unrecognized voteservice Msg type: %v", msg.Type())
+			return sdk.ErrUnknownRequest(errMsg).Result()
+		}
+	}
+}
 
 // Handle a message to set name
 func handleMsgSetName(ctx sdk.Context, keeper Keeper, msg MsgSetName) sdk.Result {
@@ -66,6 +77,14 @@ func handleMsgDeleteName(ctx sdk.Context, keeper Keeper, msg MsgDeleteName) sdk.
 	return sdk.Result{}
 }
 
-//func handleMsgAgenda(ctx sdk.Context, keeper Keeper, msg MsgMakeAgenda) sdk.Result {
-//
-//}
+func handleMsgMakeAgenda(ctx sdk.Context, voteKeeper VoteKeeper, msg MsgMakeAgenda) sdk.Result {
+	if voteKeeper.GetAgendaTopic(ctx, msg.AgendaTopic) != "" {
+		return types.ErrAgendaTopicAlreadyExist(types.DefaultCodespace).Result()
+	}
+	agenda := types.Agenda{
+		AgendaProposer: msg.AgendaProposer,
+		AgendaTopic:    msg.AgendaTopic,
+		AgendaContent:  msg.AgendaContent,
+	}
+	voteKeeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
+}

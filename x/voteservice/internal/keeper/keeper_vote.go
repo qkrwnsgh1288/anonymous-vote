@@ -18,14 +18,14 @@ func NewVoteKeeper(storeKey sdk.StoreKey, cdc *codec.Codec) VoteKeeper {
 	}
 }
 
-func (v VoteKeeper) setAgenda(ctx sdk.Context, agendaTopic string, agenda types.Agenda) {
+func (v VoteKeeper) SetAgenda(ctx sdk.Context, agendaTopic string, agenda types.Agenda) {
 	if agenda.AgendaProposer.Empty() {
 		return
 	}
 	store := ctx.KVStore(v.storekey)
 	store.Set([]byte(agendaTopic), v.cdc.MustMarshalBinaryBare(agenda))
 }
-func (v VoteKeeper) getAgenda(ctx sdk.Context, agendaTopic string) types.Agenda {
+func (v VoteKeeper) GetAgenda(ctx sdk.Context, agendaTopic string) types.Agenda {
 	store := ctx.KVStore(v.storekey)
 	if v.IsTopicPresent(ctx, agendaTopic) {
 		return types.NewAgenda()
@@ -39,4 +39,7 @@ func (v VoteKeeper) getAgenda(ctx sdk.Context, agendaTopic string) types.Agenda 
 func (v VoteKeeper) IsTopicPresent(ctx sdk.Context, agendaTopic string) bool {
 	store := ctx.KVStore(v.storekey)
 	return store.Has([]byte(agendaTopic))
+}
+func (v VoteKeeper) GetAgendaTopic(ctx sdk.Context, agendaTopic string) string {
+	return v.GetAgenda(ctx, agendaTopic).AgendaTopic
 }

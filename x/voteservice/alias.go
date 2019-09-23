@@ -23,11 +23,13 @@ var (
 )
 
 type (
-	Keeper        = keeper.Keeper
+	Keeper     = keeper.Keeper
+	VoteKeeper = keeper.VoteKeeper
+
 	MsgSetName    = types.MsgSetName
 	MsgBuyName    = types.MsgBuyName
 	MsgDeleteName = types.MsgDeleteName
-	MsgAgenda     = types.MsgMakeAgenda
+	MsgMakeAgenda = types.MsgMakeAgenda
 
 	QueryResResolve = types.QueryResResolve
 	QueryResNames   = types.QueryResNames
