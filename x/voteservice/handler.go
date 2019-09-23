@@ -87,4 +87,5 @@ func handleMsgMakeAgenda(ctx sdk.Context, voteKeeper VoteKeeper, msg MsgMakeAgen
 		AgendaContent:  msg.AgendaContent,
 	}
 	voteKeeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
+	return sdk.Result{}
 }
