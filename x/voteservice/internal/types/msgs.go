@@ -8,9 +8,9 @@ const RouterKey = ModuleName // this was defined in your key.go file
 
 // MsgMakeAgenda
 type MsgMakeAgenda struct {
-	AgendaProposer sdk.AccAddress `json:"agenda-proposer"`
-	AgendaTopic    string         `json:"agenda-topic"`
-	AgendaContent  string         `json:"agenda-content"`
+	AgendaProposer sdk.AccAddress `json:"agenda_proposer"`
+	AgendaTopic    string         `json:"agenda_topic"`
+	AgendaContent  string         `json:"agenda_content"`
 }
 
 func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaContent string) MsgMakeAgenda {

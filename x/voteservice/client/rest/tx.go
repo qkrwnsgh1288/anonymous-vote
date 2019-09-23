@@ -11,9 +11,9 @@ import (
 
 type makeAgendaReq struct {
 	BaseReq        rest.BaseReq `json:"base_req"`
-	AgendaProposer string       `json:"agenda-proposer"`
-	AgendaTopic    string       `json:"agenda-topic"`
-	AgendaContent  string       `json:"agenda-content"`
+	AgendaProposer string       `json:"agenda_proposer"`
+	AgendaTopic    string       `json:"agenda_topic"`
+	AgendaContent  string       `json:"agenda_content"`
 }
 
 func makeAgendaHandler(cliCtx context.CLIContext) http.HandlerFunc {

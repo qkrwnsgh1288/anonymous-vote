@@ -7,13 +7,13 @@ import (
 )
 
 type Agenda struct {
-	AgendaProposer sdk.AccAddress `json:"agenda-proposer"`
-	AgendaTopic    string         `json:"agenda-topic"`
-	AgendaContent  string         `json:"agenda-content"`
+	AgendaProposer sdk.AccAddress `json:"agenda_proposer"`
+	AgendaTopic    string         `json:"agenda_topic"`
+	AgendaContent  string         `json:"agenda_content"`
 
 	Voters   []string `json:"voters"`
-	ProCount uint32   `json:"pro-count"`
-	NegCount uint32   `json:"neg-count"`
+	ProCount uint32   `json:"pro_count"`
+	NegCount uint32   `json:"neg_count"`
 }
 
 func NewAgenda() Agenda {
