@@ -10,104 +10,41 @@ import (
 
 // query endpoints supported by the voteservice Querier
 const (
-	QueryResolve = "resolve"
-	QueryWhois   = "whois"
-	QueryNames   = "names"
-
-	QueryAgenda  = "agenda"
-	QueryAgendas = "agendas"
+	QueryAgenda = "agenda"
+	QueryTopics = "topics"
 )
 
 // NewQuerier is the module level router for state queries
 func NewQuerier(keeper Keeper) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
 		switch path[0] {
-		case QueryResolve:
-			return queryResolve(ctx, path[1:], req, keeper)
-		case QueryWhois:
-			return queryWhois(ctx, path[1:], req, keeper)
-		case QueryNames:
-			return queryNames(ctx, req, keeper)
-		default:
-			return nil, sdk.ErrUnknownRequest("unknown voteservice query endpoint")
-		}
-	}
-}
-func NewVoteQuerier(votekeeper VoteKeeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err sdk.Error) {
-		switch path[0] {
 		case QueryAgenda:
-			return queryAgenda(ctx, path[1:], req, votekeeper)
-		case QueryAgendas:
-			return queryAgendas(ctx, req, votekeeper)
+			return queryAgenda(ctx, path[1:], req, keeper)
+		case QueryTopics:
+			return queryTopics(ctx, req, keeper)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown voteservice query endpoint")
 		}
 	}
 }
 
-func queryAgenda(ctx sdk.Context, path []string, req abci.RequestQuery, votekeeper VoteKeeper) ([]byte, sdk.Error) {
-	agenda := votekeeper.GetAgenda(ctx, path[0])
-	res, err := codec.MarshalJSONIndent(votekeeper.cdc, agenda)
+func queryAgenda(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	agenda := keeper.GetAgenda(ctx, path[0])
+	res, err := codec.MarshalJSONIndent(keeper.cdc, agenda)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
 	return res, nil
 }
-func queryAgendas(ctx sdk.Context, req abci.RequestQuery, votekeeper VoteKeeper) ([]byte, sdk.Error) {
-	var topicList types.QueryResAgendas
-	iterator := votekeeper.GetTopicsIterator(ctx)
+func queryTopics(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	var topicList types.QueryResTopics
+	iterator := keeper.GetTopicsIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 		topicList = append(topicList, string(iterator.Key()))
 	}
-	res, err := codec.MarshalJSONIndent(votekeeper.cdc, topicList)
+	res, err := codec.MarshalJSONIndent(keeper.cdc, topicList)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
-	return res, nil
-}
-
-// nolint: unparam
-func queryResolve(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	value := keeper.ResolveName(ctx, path[0])
-
-	if value == "" {
-		return []byte{}, sdk.ErrUnknownRequest("could not resolve name")
-	}
-
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResResolve{Value: value})
-	if err != nil {
-		panic("could not marshal result to JSON")
-	}
-
-	return res, nil
-}
-
-// nolint: unparam
-func queryWhois(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	whois := keeper.GetWhois(ctx, path[0])
-
-	res, err := codec.MarshalJSONIndent(keeper.cdc, whois)
-	if err != nil {
-		panic("could not marshal result to JSON")
-	}
-
-	return res, nil
-}
-
-func queryNames(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-	var namesList types.QueryResNames
-
-	iterator := keeper.GetNamesIterator(ctx)
-
-	for ; iterator.Valid(); iterator.Next() {
-		namesList = append(namesList, string(iterator.Key()))
-	}
-
-	res, err := codec.MarshalJSONIndent(keeper.cdc, namesList)
-	if err != nil {
-		panic("could not marshal result to JSON")
-	}
-
 	return res, nil
 }
