@@ -27,7 +27,7 @@ func (v Keeper) SetAgenda(ctx sdk.Context, agendaTopic string, agenda types.Agen
 }
 func (v Keeper) GetAgenda(ctx sdk.Context, agendaTopic string) types.Agenda {
 	store := ctx.KVStore(v.storekey)
-	if v.IsTopicPresent(ctx, agendaTopic) {
+	if !v.IsTopicPresent(ctx, agendaTopic) {
 		return types.NewAgenda()
 	}
 	bz := store.Get([]byte(agendaTopic))
