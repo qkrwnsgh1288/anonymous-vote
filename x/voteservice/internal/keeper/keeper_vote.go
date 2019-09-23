@@ -43,3 +43,7 @@ func (v VoteKeeper) IsTopicPresent(ctx sdk.Context, agendaTopic string) bool {
 func (v VoteKeeper) GetAgendaTopic(ctx sdk.Context, agendaTopic string) string {
 	return v.GetAgenda(ctx, agendaTopic).AgendaTopic
 }
+func (v VoteKeeper) GetTopicsIterator(ctx sdk.Context) sdk.Iterator {
+	store := ctx.KVStore(v.storekey)
+	return sdk.KVStorePrefixIterator(store, []byte{})
+}
