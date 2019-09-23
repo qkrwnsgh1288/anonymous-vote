@@ -20,18 +20,25 @@ var (
 	NewWhois         = types.NewWhois
 	RegisterCodec    = types.RegisterCodec
 	ModuleCdc        = types.ModuleCdc
+
+	NewVoteKeeper    = keeper.NewVoteKeeper
+	NewVoteQuerier   = keeper.NewVoteQuerier
+	NewMsgMakeAgenda = types.NewMsgMakeAgenda
+	NewAgenda        = types.NewAgenda
 )
 
 type (
-	Keeper     = keeper.Keeper
-	VoteKeeper = keeper.VoteKeeper
+	Keeper = keeper.Keeper
 
 	MsgSetName    = types.MsgSetName
 	MsgBuyName    = types.MsgBuyName
 	MsgDeleteName = types.MsgDeleteName
-	MsgMakeAgenda = types.MsgMakeAgenda
 
 	QueryResResolve = types.QueryResResolve
 	QueryResNames   = types.QueryResNames
 	Whois           = types.Whois
+
+	VoteKeeper    = keeper.VoteKeeper
+	MsgMakeAgenda = types.MsgMakeAgenda
+	Agenda        = types.Agenda
 )

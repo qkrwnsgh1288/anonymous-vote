@@ -87,6 +87,7 @@ type nameServiceApp struct {
 	supplyKeeper   supply.Keeper
 	paramsKeeper   params.Keeper
 	nsKeeper       voteservice.Keeper
+	voteKeeper     voteservice.VoteKeeper
 
 	// Module Manager
 	mm *module.Manager

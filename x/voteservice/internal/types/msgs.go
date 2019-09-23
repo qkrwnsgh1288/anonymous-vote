@@ -110,7 +110,7 @@ type MsgMakeAgenda struct {
 	AgendaContent  string         `json:"agenda-content"`
 }
 
-func NewMsgAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaContent string) MsgMakeAgenda {
+func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaContent string) MsgMakeAgenda {
 	return MsgMakeAgenda{
 		AgendaProposer: agendaProposer,
 		AgendaTopic:    agendaTopic,
