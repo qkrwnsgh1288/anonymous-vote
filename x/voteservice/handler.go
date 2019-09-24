@@ -42,7 +42,7 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 	}
 
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
-	agenda.Voters = append(agenda.Voters, msg.VoteAddr.String()) // todo: string -> sdk.AccAddress
+	agenda.Voters = append(agenda.Voters, msg.VoteAddr)
 	if msg.YesOrNo {
 		agenda.ProCount += 1
 	} else {

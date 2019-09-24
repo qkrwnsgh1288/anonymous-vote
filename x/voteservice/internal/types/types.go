@@ -11,9 +11,9 @@ type Agenda struct {
 	AgendaTopic    string         `json:"agenda_topic"`
 	AgendaContent  string         `json:"agenda_content"`
 
-	Voters   []string `json:"voters"`
-	ProCount uint32   `json:"pro_count"`
-	NegCount uint32   `json:"neg_count"`
+	Voters   []sdk.AccAddress `json:"voters"`
+	ProCount uint32           `json:"pro_count"`
+	NegCount uint32           `json:"neg_count"`
 }
 
 func NewAgenda() Agenda {
