@@ -24,9 +24,10 @@ func NewHandler(keeper Keeper) sdk.Handler {
 
 func handleMsgMakeAgenda(ctx sdk.Context, keeper Keeper, msg MsgMakeAgenda) sdk.Result {
 	// todo: more valid check
-	if keeper.GetAgendaTopic(ctx, msg.AgendaTopic) != "" {
+	if keeper.IsTopicPresent(ctx, msg.AgendaTopic) {
 		return types.ErrAgendaTopicAlreadyExist(types.DefaultCodespace).Result()
 	}
+
 	agenda := types.Agenda{
 		AgendaProposer: msg.AgendaProposer,
 		AgendaTopic:    msg.AgendaTopic,
