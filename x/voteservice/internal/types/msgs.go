@@ -18,7 +18,7 @@ type MsgMakeAgenda struct {
 	AgendaTopic   string   `json:"agenda_topic"`
 	AgendaContent string   `json:"agenda_content"`
 	WhiteList     []string `json:"whitelist"`
-	VoteCheckList []bool   `json:"vote_checklist"`
+	VoteCheckList []string `json:"vote_checklist"`
 	//WhiteList     map[string]bool `json:"whitelist"`
 }
 
@@ -27,9 +27,9 @@ func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaC
 	for _, addr := range whiteListSlice {
 		whiteList[addr] = false
 	}*/
-	var voteCheckList []bool
+	var voteCheckList []string
 	for i := 0; i < len(whiteList); i++ {
-		voteCheckList = append(voteCheckList, false)
+		voteCheckList = append(voteCheckList, "empty")
 	}
 
 	return MsgMakeAgenda{

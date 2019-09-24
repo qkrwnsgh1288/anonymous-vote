@@ -21,19 +21,19 @@ func TestYesOrNo(t *testing.T) {
 type TestStruct struct {
 	Name     string
 	Value    []string
-	VoteList []bool
+	VoteList []string
 	//Value map[string]bool
 }
 
 func TestMarshal(t *testing.T) {
 	valList := []string{"AAA", "BBB", "CCC"}
-	var voteList []bool
+	var voteList []string
 	//for _, val := range valList {
 	//	fmt.Println("valid check", val)
 	//	voteList = append(voteList, false)
 	//}
 	for i := 0; i < len(valList); i++ {
-		voteList = append(voteList, false)
+		voteList = append(voteList, "notyet")
 	}
 	a := TestStruct{
 		Name:     "name",
@@ -43,6 +43,8 @@ func TestMarshal(t *testing.T) {
 	}
 	//a.Value["aaa"]=true
 	//a.Value["bbb"]=false
+	a.VoteList[1] = "yes"
+
 	fmt.Println("a=", a)
 
 	testCdc := codec.New()

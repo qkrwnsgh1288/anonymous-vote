@@ -46,12 +46,10 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 	}
 
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
-	if msg.YesOrNo == "yes" {
-		agenda.ProCount += 1
-	} else if msg.YesOrNo == "no" {
-		agenda.NegCount += 1
-	} else {
-		return types.ErrInvalidAnswer(types.DefaultCodespace).Result()
+	for i, val := range agenda.WhiteList {
+		if msg.VoteAddr.String() == val {
+			agenda.VoteCheckList[i] = msg.YesOrNo
+		}
 	}
 
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
