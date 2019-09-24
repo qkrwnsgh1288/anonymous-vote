@@ -34,6 +34,7 @@ func handleMsgMakeAgenda(ctx sdk.Context, keeper Keeper, msg MsgMakeAgenda) sdk.
 		AgendaContent:  msg.AgendaContent,
 		WhiteList:      msg.WhiteList,
 		VoteCheckList:  msg.VoteCheckList,
+		Progress:       fmt.Sprintf("%d/%d", 0, len(msg.WhiteList)),
 	}
 
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
@@ -44,13 +45,18 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 	if !keeper.IsTopicPresent(ctx, msg.AgendaTopic) {
 		return types.ErrAgendaTopicDoesNotExist(types.DefaultCodespace).Result()
 	}
-
+	voteCount := 0
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
+
 	for i, val := range agenda.WhiteList {
 		if msg.VoteAddr.String() == val {
 			agenda.VoteCheckList[i] = msg.YesOrNo
 		}
+		if agenda.VoteCheckList[i] != "empty" {
+			voteCount += 1
+		}
 	}
+	agenda.Progress = fmt.Sprintf("%d/%d", voteCount, len(agenda.WhiteList))
 
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
 	return sdk.Result{}

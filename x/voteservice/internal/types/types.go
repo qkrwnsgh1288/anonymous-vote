@@ -13,6 +13,8 @@ type Agenda struct {
 
 	WhiteList     []string `json:"whitelist"`
 	VoteCheckList []string `json:"vote_checklist"` // todo: change to private
+
+	Progress string `json:"progress"`
 	//WhiteList map[string]bool  `json:"whitelist"`
 }
 
@@ -25,5 +27,6 @@ func (a Agenda) String() string {
 AgendaTopic: %s
 AgendaContent: %s
 WhiteList: %v
-VoteCheckList: %v`, a.AgendaProposer, a.AgendaTopic, a.AgendaContent, a.WhiteList, a.VoteCheckList))
+VoteCheckList: %v
+Progress: %s`, a.AgendaProposer, a.AgendaTopic, a.AgendaContent, a.WhiteList, a.VoteCheckList, a.Progress))
 }
