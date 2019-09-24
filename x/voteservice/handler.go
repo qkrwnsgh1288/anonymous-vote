@@ -33,8 +33,9 @@ func handleMsgMakeAgenda(ctx sdk.Context, keeper Keeper, msg MsgMakeAgenda) sdk.
 		AgendaTopic:    msg.AgendaTopic,
 		AgendaContent:  msg.AgendaContent,
 		WhiteList:      msg.WhiteList,
+		VoteCheckList:  msg.VoteCheckList,
 	}
-	fmt.Println("agenda=", agenda)
+
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
 	return sdk.Result{}
 }

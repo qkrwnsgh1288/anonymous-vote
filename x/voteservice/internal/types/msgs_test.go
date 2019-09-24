@@ -19,15 +19,26 @@ func TestYesOrNo(t *testing.T) {
 }
 
 type TestStruct struct {
-	Name  string
-	Value []string
+	Name     string
+	Value    []string
+	VoteList []bool
 	//Value map[string]bool
 }
 
 func TestMarshal(t *testing.T) {
+	valList := []string{"AAA", "BBB", "CCC"}
+	var voteList []bool
+	//for _, val := range valList {
+	//	fmt.Println("valid check", val)
+	//	voteList = append(voteList, false)
+	//}
+	for i := 0; i < len(valList); i++ {
+		voteList = append(voteList, false)
+	}
 	a := TestStruct{
-		Name:  "name",
-		Value: []string{"aaa", "bbb"},
+		Name:     "name",
+		Value:    valList,
+		VoteList: voteList,
 		//Value: make(map[string]bool),
 	}
 	//a.Value["aaa"]=true
@@ -42,5 +53,4 @@ func TestMarshal(t *testing.T) {
 	var b TestStruct
 	testCdc.MustUnmarshalBinaryBare(encodedData, &b)
 	fmt.Println("b=", b)
-
 }
