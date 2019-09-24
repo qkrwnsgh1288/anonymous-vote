@@ -18,6 +18,7 @@ var (
 	ModuleCdc     = types.ModuleCdc
 
 	NewMsgMakeAgenda = types.NewMsgMakeAgenda
+	NewMsgVoteAgenda = types.NewMsgVoteAgenda
 	NewAgenda        = types.NewAgenda
 )
 
@@ -25,5 +26,6 @@ type (
 	Keeper = keeper.Keeper
 
 	MsgMakeAgenda = types.MsgMakeAgenda
+	MsgVoteAgenda = types.MsgVoteAgenda
 	Agenda        = types.Agenda
 )

@@ -17,5 +17,6 @@ func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string) 
 	r.HandleFunc(fmt.Sprintf("/%s/agendas/{%s}", storeName, restName), agendaHandler(cliCtx, storeName)).Methods("GET")
 
 	// tx
-	r.HandleFunc(fmt.Sprintf("/%s/agendas", storeName), makeAgendaHandler(cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/%s/agendas/make", storeName), makeAgendaHandler(cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/%s/agendas/vote", storeName), voteAgendaHandler(cliCtx)).Methods("POST")
 }
