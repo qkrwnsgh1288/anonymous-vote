@@ -15,6 +15,7 @@ type makeAgendaReq struct {
 	AgendaProposer string       `json:"agenda_proposer"`
 	AgendaTopic    string       `json:"agenda_topic"`
 	AgendaContent  string       `json:"agenda_content"`
+	WhiteList      []string     `json:"whitelist"`
 }
 
 func makeAgendaHandler(cliCtx context.CLIContext) http.HandlerFunc {
@@ -37,7 +38,7 @@ func makeAgendaHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		msg := types.NewMsgMakeAgenda(addr, req.AgendaTopic, req.AgendaContent)
+		msg := types.NewMsgMakeAgenda(addr, req.AgendaTopic, req.AgendaContent, req.WhiteList)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

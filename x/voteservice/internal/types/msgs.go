@@ -14,27 +14,38 @@ var (
 // MsgMakeAgenda
 type MsgMakeAgenda struct {
 	AgendaProposer sdk.AccAddress `json:"agenda_proposer"`
-	AgendaTopic    string         `json:"agenda_topic"`
-	AgendaContent  string         `json:"agenda_content"`
+
+	AgendaTopic   string   `json:"agenda_topic"`
+	AgendaContent string   `json:"agenda_content"`
+	WhiteList     []string `json:"whitelist"`
+	//WhiteList     map[string]bool `json:"whitelist"`
 }
 
-func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaContent string) MsgMakeAgenda {
+func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaContent string, whiteList []string) MsgMakeAgenda {
+	/*whiteList := make(map[string]bool)
+	for _, addr := range whiteListSlice {
+		whiteList[addr] = false
+	}*/
+
 	return MsgMakeAgenda{
 		AgendaProposer: agendaProposer,
 		AgendaTopic:    agendaTopic,
 		AgendaContent:  agendaContent,
+		WhiteList:      whiteList,
 	}
 }
 func (msg MsgMakeAgenda) Route() string { return RouterKey }
 func (msg MsgMakeAgenda) Type() string  { return "make_agenda" }
-
-// todo: more
 func (msg MsgMakeAgenda) ValidateBasic() sdk.Error {
+	// todo: more
 	if len(msg.AgendaTopic) == 0 {
 		return sdk.ErrUnknownRequest("AgendaTopic cannot be empty")
 	}
 	if len(msg.AgendaContent) == 0 {
 		return sdk.ErrUnknownRequest("AgendaContent cannot be empty")
+	}
+	if len(msg.WhiteList) == 0 {
+		return sdk.ErrUnknownRequest("WhiteList cannot be empty")
 	}
 	return nil
 }
@@ -61,9 +72,8 @@ func NewMsgVoteAgenda(voteAddr sdk.AccAddress, topic string, yesOrNo string) Msg
 }
 func (msg MsgVoteAgenda) Route() string { return RouterKey }
 func (msg MsgVoteAgenda) Type() string  { return "vote_agenda" }
-
-// todo: more
 func (msg MsgVoteAgenda) ValidateBasic() sdk.Error {
+	// todo: more
 	if len(msg.AgendaTopic) == 0 {
 		return sdk.ErrUnknownRequest("AgendaTopic cannot be empty")
 	}

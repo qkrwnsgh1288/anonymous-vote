@@ -30,7 +30,8 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 }
 
 func GetCmdMakeAgenda(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+	var whiteList []string
+	c := &cobra.Command{
 		Use:   "make-agenda [topic] [content]",
 		Short: "make agenda",
 		Args:  cobra.ExactArgs(2),
@@ -38,13 +39,16 @@ func GetCmdMakeAgenda(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			msg := types.NewMsgMakeAgenda(cliCtx.GetFromAddress(), args[0], args[1])
+			msg := types.NewMsgMakeAgenda(cliCtx.GetFromAddress(), args[0], args[1], whiteList)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
+	c.Flags().StringSliceVarP(&whiteList, "whitelist", "w", []string{}, "")
+
+	return c
 }
 func GetCmdVoteAgenda(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{

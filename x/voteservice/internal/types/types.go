@@ -11,9 +11,10 @@ type Agenda struct {
 	AgendaTopic    string         `json:"agenda_topic"`
 	AgendaContent  string         `json:"agenda_content"`
 
-	Voters   []sdk.AccAddress `json:"voters"`
-	ProCount uint32           `json:"pro_count"`
-	NegCount uint32           `json:"neg_count"`
+	WhiteList []string `json:"whitelist"`
+	ProCount  uint32   `json:"pro_count"` //todo: change to private
+	NegCount  uint32   `json:"neg_count"` //todo: change to private
+	//WhiteList map[string]bool  `json:"whitelist"`
 }
 
 func NewAgenda() Agenda {
@@ -24,7 +25,7 @@ func (a Agenda) String() string {
 	return strings.TrimSpace(fmt.Sprintf(`AgendaProposer: %s
 AgendaTopic: %s
 AgendaContent: %s
-Voters: %v
+WhiteList: %v
 ProCount: %d
-NegCount: %d`, a.AgendaProposer, a.AgendaTopic, a.AgendaContent, a.Voters, a.ProCount, a.NegCount))
+NegCount: %d`, a.AgendaProposer, a.AgendaTopic, a.AgendaContent, a.WhiteList, a.ProCount, a.NegCount))
 }

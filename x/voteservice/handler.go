@@ -32,7 +32,9 @@ func handleMsgMakeAgenda(ctx sdk.Context, keeper Keeper, msg MsgMakeAgenda) sdk.
 		AgendaProposer: msg.AgendaProposer,
 		AgendaTopic:    msg.AgendaTopic,
 		AgendaContent:  msg.AgendaContent,
+		WhiteList:      msg.WhiteList,
 	}
+	fmt.Println("agenda=", agenda)
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
 	return sdk.Result{}
 }
@@ -43,7 +45,6 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 	}
 
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
-	agenda.Voters = append(agenda.Voters, msg.VoteAddr)
 	if msg.YesOrNo == "yes" {
 		agenda.ProCount += 1
 	} else if msg.YesOrNo == "no" {
