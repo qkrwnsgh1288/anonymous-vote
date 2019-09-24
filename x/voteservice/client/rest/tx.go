@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/qkrwnsgh1288/vote-dapp/x/voteservice/internal/types"
 	"net/http"
-	"strconv"
+	"strings"
 )
 
 type makeAgendaReq struct {
@@ -73,11 +73,8 @@ func voteAgendaHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		answer, err := strconv.ParseBool(req.YesOrNo)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+
+		answer := strings.TrimSpace(strings.ToLower(req.YesOrNo))
 
 		msg := types.NewMsgVoteAgenda(addr, req.AgendaTopic, answer)
 		if err := msg.ValidateBasic(); err != nil {

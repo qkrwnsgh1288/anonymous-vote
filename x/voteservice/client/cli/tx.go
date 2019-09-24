@@ -1,9 +1,6 @@
 package cli
 
 import (
-	"github.com/spf13/cobra"
-	"strconv"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -11,6 +8,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/qkrwnsgh1288/vote-dapp/x/voteservice/internal/types"
+	"github.com/spf13/cobra"
+	"strings"
 )
 
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
@@ -49,17 +48,15 @@ func GetCmdMakeAgenda(cdc *codec.Codec) *cobra.Command {
 }
 func GetCmdVoteAgenda(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "vote-agenda [topic] [true or false]",
+		Use:   "vote-agenda [topic] [yes or no]",
 		Short: "vote agenda about topic",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			answer, err := strconv.ParseBool(args[1])
-			if err != nil {
-				return err
-			}
+			answer := strings.TrimSpace(strings.ToLower(args[1]))
+
 			msg := types.NewMsgVoteAgenda(cliCtx.GetFromAddress(), args[0], answer)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

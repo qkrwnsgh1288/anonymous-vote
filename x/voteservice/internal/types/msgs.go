@@ -49,10 +49,10 @@ func (msg MsgMakeAgenda) GetSigners() []sdk.AccAddress {
 type MsgVoteAgenda struct {
 	AgendaTopic string         `json:"agenda_topic"`
 	VoteAddr    sdk.AccAddress `json:"vote_addr"`
-	YesOrNo     bool           `json:"yes_or_no"`
+	YesOrNo     string         `json:"yes_or_no"`
 }
 
-func NewMsgVoteAgenda(voteAddr sdk.AccAddress, topic string, yesOrNo bool) MsgVoteAgenda {
+func NewMsgVoteAgenda(voteAddr sdk.AccAddress, topic string, yesOrNo string) MsgVoteAgenda {
 	return MsgVoteAgenda{
 		AgendaTopic: topic,
 		VoteAddr:    voteAddr,
@@ -67,6 +67,11 @@ func (msg MsgVoteAgenda) ValidateBasic() sdk.Error {
 	if len(msg.AgendaTopic) == 0 {
 		return sdk.ErrUnknownRequest("AgendaTopic cannot be empty")
 	}
+
+	if !(msg.YesOrNo == "yes" || msg.YesOrNo == "no") {
+		return sdk.ErrUnknownRequest("Answer should be yes or no")
+	}
+
 	return nil
 }
 func (msg MsgVoteAgenda) GetSignBytes() []byte {
