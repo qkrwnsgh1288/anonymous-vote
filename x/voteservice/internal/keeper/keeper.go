@@ -3,7 +3,7 @@ package keeper
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/qkrwnsgh1288/vote-dapp/x/voteservice/internal/types"
+	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/internal/types"
 )
 
 type Keeper struct {

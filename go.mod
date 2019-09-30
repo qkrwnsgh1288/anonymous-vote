@@ -1,4 +1,4 @@
-module github.com/qkrwnsgh1288/vote-dapp
+module github.com/qkrwnsgh1288/anonymous-vote
 
 go 1.13
 

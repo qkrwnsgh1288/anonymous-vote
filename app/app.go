@@ -25,7 +25,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
-	"github.com/qkrwnsgh1288/vote-dapp/x/voteservice"
+	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice"
 )
 
 const appName = "jh-voteservice"

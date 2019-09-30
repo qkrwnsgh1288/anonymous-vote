@@ -9,8 +9,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/qkrwnsgh1288/vote-dapp/x/voteservice/client/cli"
-	"github.com/qkrwnsgh1288/vote-dapp/x/voteservice/client/rest"
+	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/client/cli"
+	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/client/rest"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"

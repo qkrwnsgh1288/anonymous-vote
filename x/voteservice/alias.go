@@ -1,8 +1,8 @@
 package voteservice
 
 import (
-	"github.com/qkrwnsgh1288/vote-dapp/x/voteservice/internal/keeper"
-	"github.com/qkrwnsgh1288/vote-dapp/x/voteservice/internal/types"
+	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/internal/keeper"
+	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/internal/types"
 )
 
 const (

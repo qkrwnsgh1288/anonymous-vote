@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/qkrwnsgh1288/vote-dapp/x/voteservice/internal/types"
+	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/internal/types"
 	"github.com/spf13/cobra"
 	"strings"
 )

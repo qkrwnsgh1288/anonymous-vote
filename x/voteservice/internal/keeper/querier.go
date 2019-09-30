@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/qkrwnsgh1288/vote-dapp/x/voteservice/internal/types"
+	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/internal/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
