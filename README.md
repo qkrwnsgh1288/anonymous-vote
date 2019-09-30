@@ -56,6 +56,7 @@ votecli tx voteservice vote-agenda ${Topic} ${Answer} --from ${AccontAlias}
 
 # example
 votecli tx voteservice vote-agenda "yourGender" yes --from jack
+votecli tx voteservice vote-agenda "yourGender" no --from alice
 ```
 
 ### Show agenda list && details
