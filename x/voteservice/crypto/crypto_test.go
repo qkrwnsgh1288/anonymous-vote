@@ -13,24 +13,22 @@ func TestCalc(t *testing.T) {
 	var c, d int
 
 	a, b, c, d = b, a+3, a, b
-	fmt.Println(a, b, c, d)
+	//fmt.Println(a, b, c, d)
+	assert.Equal(t, 2, a)
+	assert.Equal(t, 4, b)
+	assert.Equal(t, 1, c)
+	assert.Equal(t, 2, d)
 }
 
 func TestInvmod(t *testing.T) {
-	a, err := Invmod(3, 17)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(a)
+	a, _ := Invmod(3, 17)
+	assert.Equal(t, uint(6), a)
 
-	a, err = Invmod(17, 3)
-	fmt.Println(a)
+	a, _ = Invmod(17, 3)
+	assert.Equal(t, uint(2), a)
 
-	a, err = Invmod(3, 3)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(a)
+	a, err := Invmod(3, 3)
+	assert.Equal(t, "error occured in Invmod, (a==0 or p==0 or a==p)", err.Error())
 }
 
 func TestExpmod(t *testing.T) {

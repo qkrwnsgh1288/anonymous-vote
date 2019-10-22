@@ -26,7 +26,7 @@ func hex2int(hexstring string) (v *big.Int) {
 }
 
 func TestOnCurve(t *testing.T) {
-	if !curveTest.OnCurve(curveTest.G) {
+	if !curveTest.IsOnCurve(curveTest.G) {
 		t.Fatal("failure G on curve")
 	}
 
@@ -43,7 +43,7 @@ func TestInfinity(t *testing.T) {
 	O := Point{nil, nil}
 
 	/* O not on curve */
-	if curveTest.OnCurve(O) {
+	if curveTest.IsOnCurve(O) {
 		t.Fatal("failure O on curve")
 	}
 
@@ -175,7 +175,7 @@ func TestPointScalarBaseMult(t *testing.T) {
 	t.Log("success Q = d*G")
 
 	/* Q on curve */
-	if !curveTest.OnCurve(Q) {
+	if !curveTest.IsOnCurve(Q) {
 		t.Fatal("failure Q on curve")
 	}
 	t.Log("success Q on curve")

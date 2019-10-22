@@ -124,8 +124,8 @@ func (ec *EllipticCurve) IsInfinity(P Point) bool {
 	return false
 }
 
-// OnCurve checks if point P is on EllipticCurve ec.
-func (ec *EllipticCurve) OnCurve(P Point) bool {
+// IsOnCurve checks if point P is on EllipticCurve ec.
+func (ec *EllipticCurve) IsOnCurve(P Point) bool {
 	if ec.IsInfinity(P) {
 		return false
 	}
@@ -144,7 +144,7 @@ func (ec *EllipticCurve) OnCurve(P Point) bool {
 	return false
 }
 func (ec *EllipticCurve) IsPubKey(P Point) bool {
-	return ec.OnCurve(P)
+	return ec.IsOnCurve(P)
 }
 
 // Add computes R = P + Q on EllipticCurve ec.
@@ -286,7 +286,7 @@ func (ec *EllipticCurve) Decompress(x *big.Int, ylsb uint) (P Point, err error) 
 	P.X = x
 	P.Y = y
 
-	if !ec.OnCurve(P) {
+	if !ec.IsOnCurve(P) {
 		return P, errors.New("Compressed (x, ylsb) not on curve.")
 	}
 
