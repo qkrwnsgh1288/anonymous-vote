@@ -80,5 +80,6 @@ func TestCreateZKPValidcheck1(t *testing.T) {
 
 	vote1ZK.xG.X = common.GetBigInt("30061975807968526978116138222528932566686537412871265156620434532445965483943", 10)
 	_, err = CreateZKP(vote1ZK.x, vote1ZK.v, vote1ZK.xG)
-	assert.Error(t, err, "xG is not pubKey")
+	assert.Equal(t, "error occured in CreateZKP: xG is not pubKey", err.Error())
+
 }
