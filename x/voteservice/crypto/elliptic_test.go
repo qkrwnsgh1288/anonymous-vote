@@ -6,18 +6,18 @@ import (
 	"testing"
 )
 
-var curve EllipticCurve
+var curveTest EllipticCurve
 
 func init() {
 	/* See SEC2 pg.9 http://www.secg.org/collateral/sec2_final.pdf */
 	/* secp256k1 elliptic curve parameters */
-	curve.P, _ = new(big.Int).SetString("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", 16)
-	curve.A, _ = new(big.Int).SetString("0000000000000000000000000000000000000000000000000000000000000000", 16)
-	curve.B, _ = new(big.Int).SetString("0000000000000000000000000000000000000000000000000000000000000007", 16)
-	curve.G.X, _ = new(big.Int).SetString("79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798", 16)
-	curve.G.Y, _ = new(big.Int).SetString("483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8", 16)
-	curve.N, _ = new(big.Int).SetString("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", 16)
-	curve.H, _ = new(big.Int).SetString("01", 16)
+	curveTest.P, _ = new(big.Int).SetString("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", 16)
+	curveTest.A, _ = new(big.Int).SetString("0000000000000000000000000000000000000000000000000000000000000000", 16)
+	curveTest.B, _ = new(big.Int).SetString("0000000000000000000000000000000000000000000000000000000000000007", 16)
+	curveTest.G.X, _ = new(big.Int).SetString("79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798", 16)
+	curveTest.G.Y, _ = new(big.Int).SetString("483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8", 16)
+	curveTest.N, _ = new(big.Int).SetString("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", 16)
+	curveTest.H, _ = new(big.Int).SetString("01", 16)
 }
 
 func hex2int(hexstring string) (v *big.Int) {
@@ -26,7 +26,7 @@ func hex2int(hexstring string) (v *big.Int) {
 }
 
 func TestOnCurve(t *testing.T) {
-	if !curve.IsOnCurve(curve.G) {
+	if !curveTest.OnCurve(curveTest.G) {
 		t.Fatal("failure G on curve")
 	}
 
@@ -43,12 +43,12 @@ func TestInfinity(t *testing.T) {
 	O := Point{nil, nil}
 
 	/* O not on curve */
-	if curve.IsOnCurve(O) {
+	if curveTest.OnCurve(O) {
 		t.Fatal("failure O on curve")
 	}
 
 	/* O is infinity */
-	if !curve.IsInfinity(O) {
+	if !curveTest.IsInfinity(O) {
 		t.Fatal("failure O not infinity on curve")
 	}
 
@@ -64,8 +64,8 @@ func TestPointAdd(t *testing.T) {
 
 	/* R = O + O = O */
 	{
-		R := curve.Add(O, O)
-		if !curve.IsInfinity(R) {
+		R := curveTest.Add(O, O)
+		if !curveTest.IsInfinity(R) {
 			t.Fatal("failure O + O = O")
 		}
 		t.Log("success O + O = O")
@@ -73,7 +73,7 @@ func TestPointAdd(t *testing.T) {
 
 	/* R = P + O = P */
 	{
-		R := curve.Add(P, O)
+		R := curveTest.Add(P, O)
 		if R.X.Cmp(P.X) != 0 || R.Y.Cmp(P.Y) != 0 {
 			t.Fatal("failure P + O = P")
 		}
@@ -82,7 +82,7 @@ func TestPointAdd(t *testing.T) {
 
 	/* R = O + Q = Q */
 	{
-		R := curve.Add(O, P)
+		R := curveTest.Add(O, P)
 		if R.X.Cmp(P.X) != 0 || R.Y.Cmp(P.Y) != 0 {
 			t.Fatal("failure O + Q = Q")
 		}
@@ -91,10 +91,10 @@ func TestPointAdd(t *testing.T) {
 
 	/* R = (x,y) + (x,-y) = O */
 	{
-		Q := Point{P.X, subMod(big.NewInt(0), P.Y, curve.P)}
+		Q := Point{P.X, subMod(big.NewInt(0), P.Y, curveTest.P)}
 
-		R := curve.Add(P, Q)
-		if !curve.IsInfinity(R) {
+		R := curveTest.Add(P, Q)
+		if !curveTest.IsInfinity(R) {
 			t.Fatal("failure (x,y) + (x,-y) = O")
 		}
 		t.Log("success (x,y) + (x,-y) = O")
@@ -104,7 +104,7 @@ func TestPointAdd(t *testing.T) {
 	{
 		PP := Point{hex2int("5dbcd5dfea550eb4fd3b5333f533f086bb5267c776e2a1a9d8e84c16a6743d82"), hex2int("8dde3986b6cbe395da64b6e95fb81f8af73f6e0cf1100555005bb4ba2a6a4a07")}
 
-		R := curve.Add(P, P)
+		R := curveTest.Add(P, P)
 		if R.X.Cmp(PP.X) != 0 || R.Y.Cmp(PP.Y) != 0 {
 			t.Fatal("failure P + P")
 		}
@@ -116,7 +116,7 @@ func TestPointAdd(t *testing.T) {
 
 	/* R = P + Q */
 	{
-		R := curve.Add(P, Q)
+		R := curveTest.Add(P, Q)
 		if R.X.Cmp(PQ.X) != 0 || R.Y.Cmp(PQ.Y) != 0 {
 			t.Fatal("failure P + Q")
 		}
@@ -125,7 +125,7 @@ func TestPointAdd(t *testing.T) {
 
 	/* R = Q + P */
 	{
-		R := curve.Add(Q, P)
+		R := curveTest.Add(Q, P)
 		if R.X.Cmp(PQ.X) != 0 || R.Y.Cmp(PQ.Y) != 0 {
 			t.Fatal("failure Q + P")
 		}
@@ -141,7 +141,7 @@ func TestPointScalarMult(t *testing.T) {
 	/* Q = k*P */
 	{
 		T := Point{hex2int("87d592bfdd24adb52147fea343db93e10d0585bc66d91e365c359973c0dc7067"), hex2int("a374e206cb7c8cd1074bdf9bf6ddea135f983aaa6475c9ab3bb4c38a0046541b")}
-		Q := curve.ScalarMult(hex2int("14eb373700c3836404acd0820d9fa8dfa098d26177ca6e18b1c7f70c6af8fc18"), P)
+		Q := curveTest.ScalarMult(hex2int("14eb373700c3836404acd0820d9fa8dfa098d26177ca6e18b1c7f70c6af8fc18"), P)
 		if Q.X.Cmp(T.X) != 0 || Q.Y.Cmp(T.Y) != 0 {
 			t.Fatal("failure k*P")
 		}
@@ -150,8 +150,8 @@ func TestPointScalarMult(t *testing.T) {
 
 	/* Q = n*G = O */
 	{
-		Q := curve.ScalarMult(curve.N, curve.G)
-		if !curve.IsInfinity(Q) {
+		Q := curveTest.ScalarMult(curveTest.N, curveTest.G)
+		if !curveTest.IsInfinity(Q) {
 			t.Fatal("failure n*G = O")
 		}
 		t.Log("success n*G = O")
@@ -168,21 +168,21 @@ func TestPointScalarBaseMult(t *testing.T) {
 	P := Point{hex2int(X), hex2int(Y)}
 
 	/* Q = d*G = P */
-	Q := curve.ScalarBaseMult(hex2int(D))
+	Q := curveTest.ScalarBaseMult(hex2int(D))
 	if P.X.Cmp(Q.X) != 0 || P.Y.Cmp(Q.Y) != 0 {
 		t.Fatal("failure Q = d*G")
 	}
 	t.Log("success Q = d*G")
 
 	/* Q on curve */
-	if !curve.IsOnCurve(Q) {
+	if !curveTest.OnCurve(Q) {
 		t.Fatal("failure Q on curve")
 	}
 	t.Log("success Q on curve")
 
 	/* R = 0*G = O */
-	R := curve.ScalarBaseMult(big.NewInt(0))
-	if !curve.IsInfinity(R) {
+	R := curveTest.ScalarBaseMult(big.NewInt(0))
+	if !curveTest.IsInfinity(R) {
 		t.Fatal("failure 0*G = O")
 	}
 	t.Log("success 0*G = O")
@@ -198,7 +198,7 @@ func TestPointDecompress(t *testing.T) {
 	}
 
 	for i := 0; i < len(validDecompressVectors); i++ {
-		P, err := curve.Decompress(validDecompressVectors[i].X, validDecompressVectors[i].Y.Bit(0))
+		P, err := curveTest.Decompress(validDecompressVectors[i].X, validDecompressVectors[i].Y.Bit(0))
 		if err != nil {
 			t.Fatalf("failure decompress P, got error %v on index %d", err, i)
 		}
@@ -218,7 +218,7 @@ func TestPointDecompress(t *testing.T) {
 	}
 
 	for i := 0; i < len(invalidDecompressVectors); i++ {
-		_, err := curve.Decompress(invalidDecompressVectors[i].X, invalidDecompressVectors[i].YLsb)
+		_, err := curveTest.Decompress(invalidDecompressVectors[i].X, invalidDecompressVectors[i].YLsb)
 		if err == nil {
 			t.Fatalf("failure decompress invalid P, got decompressed point on index %d", i)
 		}
