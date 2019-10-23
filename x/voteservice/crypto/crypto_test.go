@@ -1,11 +1,52 @@
 package crypto
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/common"
+	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/crypto/secp256k1"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
+
+var vote1ZK, vote2ZK, vote3ZK ZkInfo
+
+func init() {
+	vote1ZK = ZkInfo{
+		x: common.GetBigInt("9913299858144681957286823974289411938574605225645739615654527694124463202819", 10),
+		xG: Point{
+			X: common.GetBigInt("30061975807968526978116138222528932566686537412871265156620434532445965483942", 10),
+			Y: common.GetBigInt("98141067444202828032016841245494455215374046124323329249557735915756843740538", 10),
+		},
+		v: common.GetBigInt("46174680605738213156470093129897818116924733100966263874097524943944597791118", 10),
+		w: common.GetBigInt("38363520556597256917446345152267010746310705659165182691192706661717283647109", 10),
+		r: common.GetBigInt("50335626772706697871408471165498611599437960211637817517623137749599062304789", 10),
+		d: common.GetBigInt("63472464783107388493770567796117006062886472127577491241883308220111272611979", 10),
+	}
+	vote2ZK = ZkInfo{
+		x: common.GetBigInt("73044129382900516458626751513450444633224877614886040552580274724707341882358", 10),
+		xG: Point{
+			X: common.GetBigInt("106453131882900883561540729696424913020938673149822726580895600813441888567406", 10),
+			Y: common.GetBigInt("51103279871057056523744718969849587301335546334788824374456705394361157035715", 10),
+		},
+		v: common.GetBigInt("5209700577050836730122816381945828534280019944306124503689657137675013206313", 10),
+		w: common.GetBigInt("3281651291674397017871631723438190271143959716071949645966259657936788081884", 10),
+		r: common.GetBigInt("41403887247771194901357327673253115844662353380189037573280322289018911955215", 10),
+		d: common.GetBigInt("54881002424480711715545502563057680527631329702287064744481231671320736961772", 10),
+	}
+	vote3ZK = ZkInfo{
+		x: common.GetBigInt("109643633626514401630001551396577794344562341547838637839149212543909734236096", 10),
+		xG: Point{
+			X: common.GetBigInt("107956135215754977339644472077254825401575884648279129012018898429310504004233", 10),
+			Y: common.GetBigInt("113679158974756670989576148654313567926994200253163665614193081831818003969237", 10),
+		},
+		v: common.GetBigInt("90296205232189910611570761372692972689976252523802034275699368039112551113416", 10),
+		w: common.GetBigInt("67234808599408419035045387287500787848801498653651572042289356038771497986569", 10),
+		r: common.GetBigInt("63027092517635873569811565836959959067401728725379842671725115301137381260942", 10),
+		d: common.GetBigInt("92351701889870080263340561154237384290634945237799585777221631564623413795918", 10),
+	}
+}
 
 func TestCalc(t *testing.T) {
 	a := 1
@@ -20,64 +61,45 @@ func TestCalc(t *testing.T) {
 	assert.Equal(t, 2, d)
 }
 
-func TestInvmod(t *testing.T) {
-	a, _ := Invmod(3, 17)
-	assert.Equal(t, uint(6), a)
-
-	a, _ = Invmod(17, 3)
-	assert.Equal(t, uint(2), a)
-
-	a, err := Invmod(3, 3)
-	assert.Equal(t, "error occured in Invmod, (a==0 or p==0 or a==p)", err.Error())
-}
-
-func TestExpmod(t *testing.T) {
-	res, err := Expmod(81792, 73363, 233)
-	if err != nil {
-		fmt.Println(err)
-	}
-	var exp uint = 161
-	assert.Equal(t, exp, res)
-
-	res, err = Expmod(1000, 1000, 19)
-	if err != nil {
-		fmt.Println(err)
-	}
-	exp = 7
-	assert.Equal(t, exp, res)
-
-	res, err = Expmod(12, 9, 1)
-	if err != nil {
-		fmt.Println(err)
-	}
-	exp = 0
-	assert.Equal(t, exp, res)
-
-	res, err = Expmod(111, 123, 53)
-	if err != nil {
-		fmt.Println(err)
-	}
-	exp = 35
-	assert.Equal(t, exp, res)
-}
-
-func TestCreateZKPValidcheck1(t *testing.T) {
-	vote1ZK := ZkInfo{
-		x: common.GetBigInt("9913299858144681957286823974289411938574605225645739615654527694124463202819", 10),
-		xG: Point{
-			X: common.GetBigInt("30061975807968526978116138222528932566686537412871265156620434532445965483942", 10),
-			Y: common.GetBigInt("98141067444202828032016841245494455215374046124323329249557735915756843740538", 10),
-		},
-		v: common.GetBigInt("46174680605738213156470093129897818116924733100966263874097524943944597791118", 10),
-		w: common.GetBigInt("38363520556597256917446345152267010746310705659165182691192706661717283647109", 10),
-		r: common.GetBigInt("50335626772706697871408471165498611599437960211637817517623137749599062304789", 10),
-		d: common.GetBigInt("63472464783107388493770567796117006062886472127577491241883308220111272611979", 10),
-	}
-	_, err := CreateZKP(vote1ZK.x, vote1ZK.v, vote1ZK.xG)
-	assert.Nil(t, err)
+func TestIsOnCurve(t *testing.T) {
+	curve := secp256k1.S256()
+	res1 := curve.IsOnCurve(vote1ZK.xG.X, vote1ZK.xG.Y)
+	assert.True(t, res1)
 
 	vote1ZK.xG.X = common.GetBigInt("30061975807968526978116138222528932566686537412871265156620434532445965483943", 10)
-	_, err = CreateZKP(vote1ZK.x, vote1ZK.v, vote1ZK.xG)
-	assert.Equal(t, "error occured in CreateZKP: xG is not pubKey", err.Error())
+	res2 := curve.IsOnCurve(vote1ZK.xG.X, vote1ZK.xG.Y)
+	assert.False(t, res2)
+
+}
+
+func TestCreateZKP(t *testing.T) {
+	res, err := CreateZKP(vote1ZK.x, vote1ZK.v, vote1ZK.xG)
+	fmt.Println(res, err)
+}
+
+func TestSha256(t *testing.T) {
+	curve := secp256k1.S256()
+	hash := sha256.New()
+
+	sender := common.GetBigInt("130e42fFa25b341b81aC1eb9E53Bc9FF0b16BBeb", 16)
+
+	var vG JacobianPoint
+	vG.X, vG.Y = curve.ScalarBaseMult(vote1ZK.v.Bytes())
+	vG.Z = secp256k1.ZForAffine(vG.X, vG.Y)
+
+	hashInput := sender.Bytes()
+	hashInput = append(hashInput, curve.Gx.Bytes()...)
+	hashInput = append(hashInput, curve.Gy.Bytes()...)
+	hashInput = append(hashInput, vote1ZK.xG.X.Bytes()...)
+	hashInput = append(hashInput, vote1ZK.xG.Y.Bytes()...)
+	//hashInput = append(hashInput, vG.X.Bytes()...)
+	//hashInput = append(hashInput, vG.Y.Bytes()...)
+	//hashInput = append(hashInput, vG.Z.Bytes()...)
+
+	hash.Write(hashInput)
+
+	md := hash.Sum(nil)
+	mdStr := hex.EncodeToString(md)
+	fmt.Println(mdStr)
 
 }

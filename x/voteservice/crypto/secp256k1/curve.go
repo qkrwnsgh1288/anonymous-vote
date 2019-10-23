@@ -112,6 +112,14 @@ func (BitCurve *BitCurve) IsOnCurve(x, y *big.Int) bool {
 	return x3.Cmp(y2) == 0
 }
 
+func ZForAffine(x, y *big.Int) *big.Int {
+	z := new(big.Int)
+	if x.Sign() != 0 || y.Sign() != 0 {
+		z.SetInt64(1)
+	}
+	return z
+}
+
 //TODO: double check if the function is okay
 // affineFromJacobian reverses the Jacobian transform. See the comment at the
 // top of the file.
