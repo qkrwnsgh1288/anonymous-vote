@@ -153,9 +153,37 @@ func TestSha256(t *testing.T) {
 	md := hash.Sum(nil)
 	mdStr := hex.EncodeToString(md)
 	assert.Equal(t, "056167e4948e5800f8fa96822d0a6c545535a29d76f6fec0ea93ed7d653d19a5", mdStr)
+
+	c := common.GetBigInt(mdStr, 16)
+	assert.Equal(t, "2433665450586170755636384720285970258250106297820018300061622432952343140773", c.String())
+}
+
+func TestMulMod(t *testing.T) {
+	curve := secp256k1.S256()
+	c := common.GetBigInt("056167e4948e5800f8fa96822d0a6c545535a29d76f6fec0ea93ed7d653d19a5", 16)
+	xc := mulMod(vote1ZK.x, c, curve.N)
+
+	assert.Equal(t, "19614916928465210708157312476173016858265549385497657515492402818443496342626", xc.String())
+}
+
+func TestSubMod(t *testing.T) {
+	curve := secp256k1.S256()
+	xc := common.GetBigInt("19614916928465210708157312476173016858265549385497657515492402818443496342626", 10)
+	r := subMod(vote1ZK.v, xc, curve.N)
+
+	assert.Equal(t, "26559763677273002448312780653724801258659183715468606358605122125501101448492", r.String())
+
 }
 
 func TestCreateZKP(t *testing.T) {
-	res, err := CreateZKP(vote1ZK.x, vote1ZK.v, vote1ZK.xG)
-	fmt.Println(res, err)
+	senderAddr := "130e42fFa25b341b81aC1eb9E53Bc9FF0b16BBeb"
+	res, err := CreateZKP(senderAddr, vote1ZK.x, vote1ZK.v, vote1ZK.xG)
+	if err != nil {
+		fmt.Println(err)
+	}
+	assert.Equal(t, 4, len(res))
+	assert.Equal(t, "26559763677273002448312780653724801258659183715468606358605122125501101448492", res[0].String())
+	assert.Equal(t, "37002400596499253347436146477359872208984972423528869527866238051389129979940", res[1].String())
+	assert.Equal(t, "46104438919360535329359949165853481514194123783534889415421577162302988165861", res[2].String())
+	assert.Equal(t, "1", res[3].String())
 }
