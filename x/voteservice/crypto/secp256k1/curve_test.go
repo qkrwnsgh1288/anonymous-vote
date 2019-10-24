@@ -33,10 +33,8 @@ func TestBitCurve_ScalarBaseMult(t *testing.T) {
 	v := common.GetBigInt("46174680605738213156470093129897818116924733100966263874097524943944597791118", 10)
 	a, b := theCurve.ScalarBaseMult(v.Bytes())
 	fmt.Println(a, b)
-
-	//addr := "0x130e42fFa25b341b81aC1eb9E53Bc9FF0b16BBeb"
-	//sha256.New()
 }
+
 func TestHash(t *testing.T) {
 	data := "aaa"
 	Gx := common.GetBigInt("79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798", 16)

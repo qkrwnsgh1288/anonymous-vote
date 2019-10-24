@@ -13,7 +13,7 @@ type Point struct {
 type JacobianPoint struct {
 	X *big.Int
 	Y *big.Int
-	Z *big.Int
+	Z []byte
 }
 
 type ZkInfo struct {
@@ -24,19 +24,6 @@ type ZkInfo struct {
 	r  *big.Int // 1 or 2, random nonce for 1outof2 zkp
 	d  *big.Int // 1 or 2, random nonce for 1outof2 zkp
 }
-
-//var curve EllipticCurve
-//func init() {
-//	/* See SEC2 pg.9 http://www.secg.org/collateral/sec2_final.pdf */
-//	/* secp256k1 elliptic curve parameters */
-//	curve.P, _ = new(big.Int).SetString("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", 16)
-//	curve.A, _ = new(big.Int).SetString("0000000000000000000000000000000000000000000000000000000000000000", 16)
-//	curve.B, _ = new(big.Int).SetString("0000000000000000000000000000000000000000000000000000000000000007", 16)
-//	curve.G.X, _ = new(big.Int).SetString("79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798", 16)
-//	curve.G.Y, _ = new(big.Int).SetString("483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8", 16)
-//	curve.N, _ = new(big.Int).SetString("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", 16)
-//	curve.H, _ = new(big.Int).SetString("01", 16)
-//}
 
 // vG (blinding value), xG (public key), x (what we are proving)
 // c = H(g, g^{v}, g^{x});

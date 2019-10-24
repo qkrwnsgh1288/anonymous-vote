@@ -7,6 +7,7 @@ import (
 	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/common"
 	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/crypto/secp256k1"
 	"github.com/stretchr/testify/assert"
+	"math/big"
 	"testing"
 )
 
@@ -54,7 +55,6 @@ func TestCalc(t *testing.T) {
 	var c, d int
 
 	a, b, c, d = b, a+3, a, b
-	//fmt.Println(a, b, c, d)
 	assert.Equal(t, 2, a)
 	assert.Equal(t, 4, b)
 	assert.Equal(t, 1, c)
@@ -69,12 +69,63 @@ func TestIsOnCurve(t *testing.T) {
 	vote1ZK.xG.X = common.GetBigInt("30061975807968526978116138222528932566686537412871265156620434532445965483943", 10)
 	res2 := curve.IsOnCurve(vote1ZK.xG.X, vote1ZK.xG.Y)
 	assert.False(t, res2)
-
 }
 
-func TestCreateZKP(t *testing.T) {
-	res, err := CreateZKP(vote1ZK.x, vote1ZK.v, vote1ZK.xG)
-	fmt.Println(res, err)
+func TestVG(t *testing.T) {
+	curve := secp256k1.S256()
+
+	var vG JacobianPoint
+	vG.X, vG.Y = curve.ScalarBaseMult(vote1ZK.v.Bytes())
+	vG.Z = secp256k1.ZForAffine(vG.X, vG.Y)
+
+	assert.Equal(t, "37002400596499253347436146477359872208984972423528869527866238051389129979940", vG.X.String())
+	assert.Equal(t, "46104438919360535329359949165853481514194123783534889415421577162302988165861", vG.Y.String())
+	assert.Equal(t, byte(0x01), vG.Z[31])
+
+	hashZ := sha256.New()
+	hashInputZ := vG.Z
+	hashZ.Write(hashInputZ)
+	assert.Equal(t, "ec4916dd28fc4c10d78e287ca5d9cc51ee1ae73cbfde08c6b37324cbfaac8bc5", hex.EncodeToString(hashZ.Sum(nil)))
+
+	hash := sha256.New()
+	hashInput := vG.X.Bytes()
+	hashInput = append(hashInput, vG.Y.Bytes()...)
+	hashInput = append(hashInput, vG.Z...)
+
+	hash.Write(hashInput)
+
+	md := hash.Sum(nil)
+	mdStr := hex.EncodeToString(md)
+	assert.Equal(t, "3671c70fe36d399d158f71abd58f782cba4ca924d073d3c27630ac1eb050fa7a", mdStr)
+}
+
+func TestLittleEndian(t *testing.T) {
+	aaa := []byte{0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+	fmt.Println(aaa)
+	bbb := new(big.Int).SetBytes(aaa)
+	bbbBytes := bbb.Bytes()
+	for i := 0; i < len(bbbBytes)/2; i++ {
+		bbbBytes[i], bbbBytes[len(bbbBytes)-i-1] = bbbBytes[len(bbbBytes)-i-1], bbbBytes[i]
+	}
+	fmt.Println(bbbBytes)
+
+	hash := sha256.New()
+	hash.Write(bbbBytes)
+	md := hash.Sum(nil)
+	mdStr := hex.EncodeToString(md)
+	assert.Equal(t, "ec4916dd28fc4c10d78e287ca5d9cc51ee1ae73cbfde08c6b37324cbfaac8bc5", mdStr)
+}
+func TestByteHash(t *testing.T) {
+	for i := 0; i < 256; i++ {
+		hash := sha256.New()
+		hashInput := []byte{byte(i)}
+
+		hash.Write(hashInput)
+		md := hash.Sum(nil)
+		mdStr := hex.EncodeToString(md)
+		fmt.Println(hashInput, mdStr)
+	}
 }
 
 func TestSha256(t *testing.T) {
@@ -86,20 +137,25 @@ func TestSha256(t *testing.T) {
 	var vG JacobianPoint
 	vG.X, vG.Y = curve.ScalarBaseMult(vote1ZK.v.Bytes())
 	vG.Z = secp256k1.ZForAffine(vG.X, vG.Y)
+	//fmt.Println(vG)
 
 	hashInput := sender.Bytes()
 	hashInput = append(hashInput, curve.Gx.Bytes()...)
 	hashInput = append(hashInput, curve.Gy.Bytes()...)
 	hashInput = append(hashInput, vote1ZK.xG.X.Bytes()...)
 	hashInput = append(hashInput, vote1ZK.xG.Y.Bytes()...)
-	//hashInput = append(hashInput, vG.X.Bytes()...)
-	//hashInput = append(hashInput, vG.Y.Bytes()...)
-	//hashInput = append(hashInput, vG.Z.Bytes()...)
+	hashInput = append(hashInput, vG.X.Bytes()...)
+	hashInput = append(hashInput, vG.Y.Bytes()...)
+	hashInput = append(hashInput, vG.Z...)
 
 	hash.Write(hashInput)
 
 	md := hash.Sum(nil)
 	mdStr := hex.EncodeToString(md)
-	fmt.Println(mdStr)
+	assert.Equal(t, "056167e4948e5800f8fa96822d0a6c545535a29d76f6fec0ea93ed7d653d19a5", mdStr)
+}
 
+func TestCreateZKP(t *testing.T) {
+	res, err := CreateZKP(vote1ZK.x, vote1ZK.v, vote1ZK.xG)
+	fmt.Println(res, err)
 }
