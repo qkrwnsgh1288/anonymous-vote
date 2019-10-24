@@ -9,6 +9,14 @@ import (
 	"math/big"
 )
 
+var (
+	curve *secp256k1.BitCurve
+)
+
+func init() {
+	curve = secp256k1.S256()
+}
+
 type Point struct {
 	X *big.Int
 	Y *big.Int
@@ -33,8 +41,6 @@ type ZkInfo struct {
 // r = v - xz (mod p);
 // return(r,vG)
 func CreateZKP(senderAddr string, x, v *big.Int, xG Point) (res [4]*big.Int, err error) {
-	curve := secp256k1.S256()
-
 	var G Point
 	G.X = curve.Gx
 	G.Y = curve.Gy
@@ -51,7 +57,7 @@ func CreateZKP(senderAddr string, x, v *big.Int, xG Point) (res [4]*big.Int, err
 
 	// Get c = H(g, g^{x}, g^{v});
 	hash := sha256.New()
-	sender := common.GetBigInt(senderAddr, 16) // todo: check
+	sender := common.GetBigInt(senderAddr, 16) // todo: senderAddr check
 
 	hashInput := sender.Bytes()
 	hashInput = append(hashInput, curve.Gx.Bytes()...)
@@ -64,8 +70,8 @@ func CreateZKP(senderAddr string, x, v *big.Int, xG Point) (res [4]*big.Int, err
 	hash.Write(hashInput)
 
 	md := hash.Sum(nil)
-	mdStr := hex.EncodeToString(md)
-	c := common.GetBigInt(mdStr, 16)
+	hexStr := hex.EncodeToString(md)
+	c := common.GetBigInt(hexStr, 16)
 
 	// Get 'r' the zkp
 	xc := mulMod(x, c, curve.N)
@@ -79,4 +85,52 @@ func CreateZKP(senderAddr string, x, v *big.Int, xG Point) (res [4]*big.Int, err
 	res[3] = new(big.Int).SetBytes(vG.Z)
 
 	return res, nil
+}
+
+// Parameters xG, r where r = v - xc, and vG.
+// Verify that vG = rG + xcG!
+func VerifyZKP(senderAddr string, xG Point, r *big.Int, vG JacobianPoint) bool {
+	var G Point
+	G.X = curve.Gx
+	G.Y = curve.Gy
+
+	// Check both keys are on the curve.
+	if !curve.IsOnCurve(xG.X, xG.Y) || !curve.IsOnCurve(vG.X, vG.Y) {
+		return false
+	}
+
+	// Get c = H(g, g^{x}, g^{v});
+	hash := sha256.New()
+	sender := common.GetBigInt(senderAddr, 16) // todo: senderAddr check
+
+	hashInput := sender.Bytes()
+	hashInput = append(hashInput, curve.Gx.Bytes()...)
+	hashInput = append(hashInput, curve.Gy.Bytes()...)
+	hashInput = append(hashInput, xG.X.Bytes()...)
+	hashInput = append(hashInput, xG.Y.Bytes()...)
+	hashInput = append(hashInput, vG.X.Bytes()...)
+	hashInput = append(hashInput, vG.Y.Bytes()...)
+	hashInput = append(hashInput, vG.Z...)
+	hash.Write(hashInput)
+
+	md := hash.Sum(nil)
+	hexStr := hex.EncodeToString(md)
+	c := common.GetBigInt(hexStr, 16)
+
+	// Get g^{r}, and g^{xc}
+	var rG JacobianPoint
+	rG.X, rG.Y = curve.ScalarBaseMult(r.Bytes())
+
+	var xcG JacobianPoint
+	xcG.X, xcG.Y = curve.ScalarMult(xG.X, xG.Y, c.Bytes())
+
+	// Add both points together
+	var rGxcG JacobianPoint
+	rGxcG.X, rGxcG.Y = curve.Add(rG.X, rG.Y, xcG.X, xcG.Y)
+
+	if rGxcG.X.Cmp(vG.X) == 0 && rGxcG.Y.Cmp(vG.Y) == 0 {
+		return true
+	} else {
+		return false
+	}
 }
