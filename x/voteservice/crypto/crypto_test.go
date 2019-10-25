@@ -76,23 +76,23 @@ func TestVG(t *testing.T) {
 
 	assert.Equal(t, "37002400596499253347436146477359872208984972423528869527866238051389129979940", vG.X.String())
 	assert.Equal(t, "46104438919360535329359949165853481514194123783534889415421577162302988165861", vG.Y.String())
-	assert.Equal(t, byte(0x01), vG.Z[31])
+	assert.Equal(t, "1", vG.Z.String())
 
 	hashZ := sha256.New()
-	hashInputZ := vG.Z
+	hashInputZ := vG.Z.Bytes()
 	hashZ.Write(hashInputZ)
-	assert.Equal(t, "ec4916dd28fc4c10d78e287ca5d9cc51ee1ae73cbfde08c6b37324cbfaac8bc5", hex.EncodeToString(hashZ.Sum(nil)))
+	assert.Equal(t, "4bf5122f344554c53bde2ebb8cd2b7e3d1600ad631c385a5d7cce23c7785459a", hex.EncodeToString(hashZ.Sum(nil)))
 
 	hash := sha256.New()
 	hashInput := vG.X.Bytes()
 	hashInput = append(hashInput, vG.Y.Bytes()...)
-	hashInput = append(hashInput, vG.Z...)
+	hashInput = append(hashInput, vG.Z.Bytes()...)
 
 	hash.Write(hashInput)
 
 	md := hash.Sum(nil)
 	hexStr := hex.EncodeToString(md)
-	assert.Equal(t, "3671c70fe36d399d158f71abd58f782cba4ca924d073d3c27630ac1eb050fa7a", hexStr)
+	assert.Equal(t, "79cddfd538609ebc9bda527391369e62f8342e3752f9e532a936e1a415ca854a", hexStr)
 }
 
 /*func TestLittleEndian(t *testing.T) {
@@ -142,30 +142,30 @@ func TestSha256(t *testing.T) {
 	hashInput = append(hashInput, vote1ZK.xG.Y.Bytes()...)
 	hashInput = append(hashInput, vG.X.Bytes()...)
 	hashInput = append(hashInput, vG.Y.Bytes()...)
-	hashInput = append(hashInput, vG.Z...)
+	hashInput = append(hashInput, vG.Z.Bytes()...)
 
 	hash.Write(hashInput)
 
 	md := hash.Sum(nil)
 	hexStr := hex.EncodeToString(md)
-	assert.Equal(t, "056167e4948e5800f8fa96822d0a6c545535a29d76f6fec0ea93ed7d653d19a5", hexStr)
+	assert.Equal(t, "66a37f3a320ce9caec790203a7e843166d5873381200dd494f0300f92876ef34", hexStr)
 
 	c := common.GetBigInt(hexStr, 16)
-	assert.Equal(t, "2433665450586170755636384720285970258250106297820018300061622432952343140773", c.String())
+	assert.Equal(t, "46424784717785924143576233396036969011302163563202020539237685875916349566772", c.String())
 }
 
 func TestMulMod(t *testing.T) {
-	c := common.GetBigInt("056167e4948e5800f8fa96822d0a6c545535a29d76f6fec0ea93ed7d653d19a5", 16)
+	c := common.GetBigInt("46424784717785924143576233396036969011302163563202020539237685875916349566772", 10)
 	xc := mulMod(vote1ZK.x, c, curve.N)
 
-	assert.Equal(t, "19614916928465210708157312476173016858265549385497657515492402818443496342626", xc.String())
+	assert.Equal(t, "13276481680719431021304732231458755388712651776249411785446475489619091431771", xc.String())
 }
 
 func TestSubMod(t *testing.T) {
-	xc := common.GetBigInt("19614916928465210708157312476173016858265549385497657515492402818443496342626", 10)
+	xc := common.GetBigInt("13276481680719431021304732231458755388712651776249411785446475489619091431771", 10)
 	r := subMod(vote1ZK.v, xc, curve.N)
 
-	assert.Equal(t, "26559763677273002448312780653724801258659183715468606358605122125501101448492", r.String())
+	assert.Equal(t, "32898198925018782135165360898439062728212081324716852088651049454325506359347", r.String())
 
 }
 
@@ -176,7 +176,7 @@ func TestCreateZKP(t *testing.T) {
 		fmt.Println(err)
 	}
 	assert.Equal(t, 4, len(res))
-	assert.Equal(t, "26559763677273002448312780653724801258659183715468606358605122125501101448492", res[0].String())
+	assert.Equal(t, "32898198925018782135165360898439062728212081324716852088651049454325506359347", res[0].String())
 	assert.Equal(t, "37002400596499253347436146477359872208984972423528869527866238051389129979940", res[1].String())
 	assert.Equal(t, "46104438919360535329359949165853481514194123783534889415421577162302988165861", res[2].String())
 	assert.Equal(t, "1", res[3].String())
@@ -191,6 +191,7 @@ func TestIsOnCurveVG(t *testing.T) {
 
 	assert.Equal(t, "37002400596499253347436146477359872208984972423528869527866238051389129979940", vG.X.String())
 	assert.Equal(t, "46104438919360535329359949165853481514194123783534889415421577162302988165861", vG.Y.String())
+	assert.Equal(t, "1", vG.Z.String())
 
 	res1 := curve.IsOnCurve(vG.X, vG.Y)
 	assert.True(t, res1)
@@ -198,7 +199,8 @@ func TestIsOnCurveVG(t *testing.T) {
 
 func TestVerifyZKP(t *testing.T) {
 	senderAddr := "130e42fFa25b341b81aC1eb9E53Bc9FF0b16BBeb"
-	r := common.GetBigInt("26559763677273002448312780653724801258659183715468606358605122125501101448492", 10)
+
+	r := common.GetBigInt("32898198925018782135165360898439062728212081324716852088651049454325506359347", 10)
 
 	var vG JacobianPoint
 	vG.X, vG.Y = curve.ScalarBaseMult(vote1ZK.v.Bytes())
@@ -207,7 +209,7 @@ func TestVerifyZKP(t *testing.T) {
 	res := VerifyZKP(senderAddr, vote1ZK.xG, r, vG)
 	assert.True(t, res)
 
-	senderAddr2 := "130e42fFa25b341b81aC1eb9E53Bc9FF0b16BBec"
-	res2 := VerifyZKP(senderAddr2, vote1ZK.xG, r, vG)
+	rFalse := common.GetBigInt("26559763677273002448312780653724801258659183715468606358605122125501101448492", 10)
+	res2 := VerifyZKP(senderAddr, vote1ZK.xG, rFalse, vG)
 	assert.False(t, res2)
 }

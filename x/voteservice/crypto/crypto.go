@@ -24,7 +24,8 @@ type Point struct {
 type JacobianPoint struct {
 	X *big.Int
 	Y *big.Int
-	Z []byte
+	Z *big.Int
+	//Z []byte
 }
 
 type ZkInfo struct {
@@ -66,7 +67,8 @@ func CreateZKP(senderAddr string, x, v *big.Int, xG Point) (res [4]*big.Int, err
 	hashInput = append(hashInput, xG.Y.Bytes()...)
 	hashInput = append(hashInput, vG.X.Bytes()...)
 	hashInput = append(hashInput, vG.Y.Bytes()...)
-	hashInput = append(hashInput, vG.Z...)
+	//hashInput = append(hashInput, vG.Z...)
+	hashInput = append(hashInput, vG.Z.Bytes()...)
 	hash.Write(hashInput)
 
 	md := hash.Sum(nil)
@@ -82,7 +84,8 @@ func CreateZKP(senderAddr string, x, v *big.Int, xG Point) (res [4]*big.Int, err
 	res[0] = r
 	res[1] = vG.X
 	res[2] = vG.Y
-	res[3] = new(big.Int).SetBytes(vG.Z)
+	//res[3] = new(big.Int).SetBytes(vG.Z)
+	res[3] = vG.Z
 
 	return res, nil
 }
@@ -110,7 +113,8 @@ func VerifyZKP(senderAddr string, xG Point, r *big.Int, vG JacobianPoint) bool {
 	hashInput = append(hashInput, xG.Y.Bytes()...)
 	hashInput = append(hashInput, vG.X.Bytes()...)
 	hashInput = append(hashInput, vG.Y.Bytes()...)
-	hashInput = append(hashInput, vG.Z...)
+	//hashInput = append(hashInput, vG.Z...)
+	hashInput = append(hashInput, vG.Z.Bytes()...)
 	hash.Write(hashInput)
 
 	md := hash.Sum(nil)
