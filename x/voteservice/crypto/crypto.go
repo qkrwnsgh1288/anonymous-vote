@@ -178,12 +178,14 @@ func VerifyZKP(senderAddr string, xG Point, r *big.Int, vG JacobianPoint) bool {
 
 // Called by participants to register their voting public key
 // Participant mut be eligible, and can only register the first key sent key.
-func Register(senderAddr string, xG Point, vG JacobianPoint, r *big.Int) {
+func Register(senderAddr string, xG Point, vG JacobianPoint, r *big.Int) error {
 	// todo:  dead line check
 	// todo: white list check
 	Voters = append(Voters, MakeVoter(senderAddr, xG))
 	//Voters[Totalregistered] = MakeVoter(senderAddr, xG)
 	Totalregistered += 1
+
+	return nil
 }
 
 // Calculate the reconstructed keys
@@ -272,7 +274,7 @@ func Create1outof2ZKPYesVote(sender string, xG, yG Point, w, r1, d1, x *big.Int)
 	// 5. b2 = h^{w} (where h = g^{y})
 	b2.X, b2.Y = Curve.ScalarMult(yG.X, yG.Y, w.Bytes())
 
-	// Get c = H(id, xG, Y, a1, b1, a2, b2);
+	// Get c = H(id, xG, Y, a1, b1, a2, b2)
 	// id is H(round, voter_index, voter_address)...
 	hash := sha256.New()
 	hInput := common.GetBigInt(sender, 16).Bytes()
@@ -299,6 +301,82 @@ func Create1outof2ZKPYesVote(sender string, xG, yG Point, w, r1, d1, x *big.Int)
 
 	// r2 = w - (x * d2)
 	r2 := subMod(w, mulMod(x, d2, Curve.N), Curve.N)
+
+	res[0] = d1
+	res[1] = d2
+	res[2] = r1
+	res[3] = r2
+
+	return y, a1, b1, a2, b2, res, err
+}
+
+// random 'W', 'r2', 'd2'
+func Create1outof2ZKPNoVote(sender string, xG, yG Point, w, r2, d2, x *big.Int) (y, a1, b1, a2, b2 Point, res [4]*big.Int, err error) {
+	temp_affine1 := MakeDefaultPoint()
+	temp_affine2 := MakeDefaultPoint()
+	temp1 := MakeDefaultPoint()
+
+	// 1. y = h^{x} * g
+	y.X, y.Y = Curve.ScalarMult(yG.X, yG.Y, x.Bytes())
+
+	// 2. a1 = g^{w}
+	a1.X, a1.Y = Curve.ScalarBaseMult(w.Bytes())
+
+	// 3. b1 = h^{w} (where h = g^{y})
+	b1.X, b1.Y = Curve.ScalarMult(yG.X, yG.Y, w.Bytes())
+
+	// 4. a2 = g^{r2} * x^{d2}
+	a2.X, a2.Y = Curve.ScalarBaseMult(r2.Bytes())
+	temp1.X, temp1.Y = Curve.ScalarMult(xG.X, xG.Y, d2.Bytes())
+	a2.X, a2.Y = Curve.Add(a2.X, a2.Y, temp1.X, temp1.Y)
+
+	// 5. b2
+	// Negate the 'y' co-ordinate of G
+	temp_affine1.X = Curve.Gx
+	temp_affine1.Y.Sub(Curve.P, Curve.Gy)
+
+	// We need the public key y in affine co-ordinates
+	temp_affine2.X = y.X
+	temp_affine2.Y = y.Y
+
+	// We should end up with y^{d2} + g^{d2} .... (but we have the negation of g.. so y-g).
+	tmpMul := MakeDefaultPoint()
+	tmpMul1 := MakeDefaultPoint()
+	tmpMul2 := MakeDefaultPoint()
+	tmpMul2.X, tmpMul2.Y = Curve.ScalarMult(temp_affine2.X, temp_affine2.Y, d2.Bytes())
+	tmpMul1.X, tmpMul1.Y = Curve.ScalarMult(temp_affine1.X, temp_affine1.Y, d2.Bytes())
+	temp1.X, temp1.Y = Curve.Add(tmpMul2.X, tmpMul2.Y, tmpMul1.X, tmpMul1.Y)
+
+	// Now... it is h^{r2} + temp2..
+	tmpMul.X, tmpMul.Y = Curve.ScalarMult(yG.X, yG.Y, r2.Bytes())
+	b2.X, b2.Y = Curve.Add(tmpMul.X, tmpMul.Y, temp1.X, temp1.Y)
+
+	// Get c = H(i, xG, Y, a1, b1, a2, b2)
+	hash := sha256.New()
+	hInput := common.GetBigInt(sender, 16).Bytes()
+	hInput = append(hInput, xG.X.Bytes()...)
+	hInput = append(hInput, xG.Y.Bytes()...)
+	hInput = append(hInput, y.X.Bytes()...)
+	hInput = append(hInput, y.Y.Bytes()...)
+	hInput = append(hInput, a1.X.Bytes()...)
+	hInput = append(hInput, a1.Y.Bytes()...)
+	hInput = append(hInput, b1.X.Bytes()...)
+	hInput = append(hInput, b1.Y.Bytes()...)
+	hInput = append(hInput, a2.X.Bytes()...)
+	hInput = append(hInput, a2.Y.Bytes()...)
+	hInput = append(hInput, b2.X.Bytes()...)
+	hInput = append(hInput, b2.Y.Bytes()...)
+	hash.Write(hInput)
+
+	md := hash.Sum(nil)
+	b_c := hex.EncodeToString(md)
+	c := common.GetBigInt(b_c, 16)
+
+	// d1 = c - d2
+	d1 := subMod(c, d2, Curve.N)
+
+	// r1 = w - (x * d1)
+	r1 := subMod(w, mulMod(x, d1, Curve.N), Curve.N)
 
 	res[0] = d1
 	res[1] = d2
