@@ -43,6 +43,15 @@ func TestBitCurve_ScalarBaseMult(t *testing.T) {
 	a, b := theCurve.ScalarBaseMult(v.Bytes())
 	fmt.Println(a, b)
 }
+func TestBitCurve_ScalarMult(t *testing.T) {
+	x := common.GetBigInt("9913299858144681957286823974289411938574605225645739615654527694124463202819", 10)
+	yG := Point{
+		X: common.GetBigInt("13640588435166186727072570872841920017273057013114604476956539355021275854144", 10),
+		Y: common.GetBigInt("90715709871810868701227023413915222907311739236101232519930156567199700809709", 10),
+	}
+	a, b := theCurve.ScalarMult(yG.X, yG.Y, x.Bytes())
+	fmt.Println(a, b)
+}
 
 func TestHash(t *testing.T) {
 	data := "aaa"

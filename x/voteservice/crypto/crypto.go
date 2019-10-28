@@ -51,12 +51,12 @@ func MakeDefaultJacobianPoint() JacobianPoint {
 }
 
 type ZkInfo struct {
-	x  *big.Int // private key
+	X  *big.Int // private key
 	xG Point    // public key
-	v  *big.Int // random nonce for zkp
-	w  *big.Int // random nonce for 1outof2 zkp
-	r  *big.Int // 1 or 2, random nonce for 1outof2 zkp
-	d  *big.Int // 1 or 2, random nonce for 1outof2 zkp
+	V  *big.Int // random nonce for zkp
+	W  *big.Int // random nonce for 1outof2 zkp
+	R  *big.Int // 1 or 2, random nonce for 1outof2 zkp
+	D  *big.Int // 1 or 2, random nonce for 1outof2 zkp
 }
 
 type Voter struct {
@@ -187,7 +187,7 @@ func Register(senderAddr string, xG Point, vG JacobianPoint, r *big.Int) {
 }
 
 // Calculate the reconstructed keys
-func finishRegistrationPhase() error {
+func FinishRegistrationPhase() error {
 	if Totalregistered < 3 {
 		return errors.New("total registered is smaller than minimum(3)")
 	}
@@ -242,4 +242,68 @@ func finishRegistrationPhase() error {
 	}
 
 	return nil
+}
+
+// random 'W', 'r1', 'd1'
+func Create1outof2ZKPYesVote(sender string, xG, yG Point, w, r1, d1, x *big.Int) (y, a1, b1, a2, b2 Point, res [4]*big.Int, err error) {
+	// 1. y = h^{X} * g
+	y.X, y.Y = Curve.ScalarMult(yG.X, yG.Y, x.Bytes())
+	y.X, y.Y = Curve.Add(y.X, y.Y, Curve.Gx, Curve.Gy)
+
+	// 2. a1 = g^{r1} * x^{d1}
+	a1.X, a1.Y = Curve.ScalarBaseMult(r1.Bytes())
+	tmp1 := MakeDefaultPoint()
+	tmp1.X, tmp1.Y = Curve.ScalarMult(xG.X, xG.Y, d1.Bytes())
+	a1.X, a1.Y = Curve.Add(a1.X, a1.Y, tmp1.X, tmp1.Y)
+
+	// 3. b1 = h^{r1} * y^{d1} (temp = affine 'y')
+	tmp1.X, tmp1.Y = Curve.ScalarMult(yG.X, yG.Y, r1.Bytes())
+	// Setting temp to 'y'
+	temp := MakeDefaultPoint()
+	temp.X.SetBytes(y.X.Bytes())
+	temp.Y.SetBytes(y.Y.Bytes())
+
+	b1_tmpX, b1_tmpY := Curve.ScalarMult(temp.X, temp.Y, d1.Bytes())
+	b1.X, b1.Y = Curve.Add(tmp1.X, tmp1.Y, b1_tmpX, b1_tmpY)
+
+	// 4. a2 = g^{w}
+	a2.X, a2.Y = Curve.ScalarBaseMult(w.Bytes())
+
+	// 5. b2 = h^{w} (where h = g^{y})
+	b2.X, b2.Y = Curve.ScalarMult(yG.X, yG.Y, w.Bytes())
+
+	// Get c = H(id, xG, Y, a1, b1, a2, b2);
+	// id is H(round, voter_index, voter_address)...
+	hash := sha256.New()
+	hInput := common.GetBigInt(sender, 16).Bytes()
+	hInput = append(hInput, xG.X.Bytes()...)
+	hInput = append(hInput, xG.Y.Bytes()...)
+	hInput = append(hInput, y.X.Bytes()...)
+	hInput = append(hInput, y.Y.Bytes()...)
+	hInput = append(hInput, a1.X.Bytes()...)
+	hInput = append(hInput, a1.Y.Bytes()...)
+	hInput = append(hInput, b1.X.Bytes()...)
+	hInput = append(hInput, b1.Y.Bytes()...)
+	hInput = append(hInput, a2.X.Bytes()...)
+	hInput = append(hInput, a2.Y.Bytes()...)
+	hInput = append(hInput, b2.X.Bytes()...)
+	hInput = append(hInput, b2.Y.Bytes()...)
+	hash.Write(hInput)
+
+	md := hash.Sum(nil)
+	hexStr := hex.EncodeToString(md)
+	c := common.GetBigInt(hexStr, 16)
+
+	// d2 = c - d1
+	d2 := subMod(c, d1, Curve.N)
+
+	// r2 = w - (x * d2)
+	r2 := subMod(w, mulMod(x, d2, Curve.N), Curve.N)
+
+	res[0] = d1
+	res[1] = d2
+	res[2] = r1
+	res[3] = r2
+
+	return y, a1, b1, a2, b2, res, err
 }
