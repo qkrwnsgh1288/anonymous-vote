@@ -266,11 +266,11 @@ func TestRegister(t *testing.T) {
 	assert.True(t, VerifyZKP(addr4, vote4ZK.xG, v4_r, v4_vG))
 	assert.True(t, VerifyZKP(addr5, vote5ZK.xG, v5_r, v5_vG))
 
-	Register(addr1, vote1ZK.xG, v1_vG, v1_r)
-	Register(addr2, vote2ZK.xG, v2_vG, v2_r)
-	Register(addr3, vote3ZK.xG, v3_vG, v3_r)
-	Register(addr4, vote4ZK.xG, v4_vG, v4_r)
-	Register(addr5, vote5ZK.xG, v5_vG, v5_r)
+	_ = Register(addr1, vote1ZK.xG, v1_vG, v1_r)
+	_ = Register(addr2, vote2ZK.xG, v2_vG, v2_r)
+	_ = Register(addr3, vote3ZK.xG, v3_vG, v3_r)
+	_ = Register(addr4, vote4ZK.xG, v4_vG, v4_r)
+	_ = Register(addr5, vote5ZK.xG, v5_vG, v5_r)
 
 	assert.Equal(t, 5, Totalregistered)
 
@@ -295,7 +295,7 @@ func TestRegister(t *testing.T) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////// 4. create vote zkp //////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////// 4. create/verify vote zkp //////////////////////////////////////////////////////////////////////////
 func TestCreate1outof2ZKPYesVote(t *testing.T) {
 	sender := "2a931B52132D9CA43D5355Fecc234FB7b1D02674"
 	vote1_yG := Point{
@@ -344,4 +344,19 @@ func TestCreate1outof2ZKPNoVote(t *testing.T) {
 	assert.Equal(t, "63472464783107388493770567796117006062886472127577491241883308220111272611979", res[1].String())
 	assert.Equal(t, "30596339251246178808891678424758772629979199048682215951963461404711905037241", res[2].String())
 	assert.Equal(t, "50335626772706697871408471165498611599437960211637817517623137749599062304789", res[3].String())
+}
+func TestVerify1outof2ZKP(t *testing.T) {
+	sender := "2a931B52132D9CA43D5355Fecc234FB7b1D02674"
+	vote1_yG := Point{
+		X: common.GetBigInt("13640588435166186727072570872841920017273057013114604476956539355021275854144", 10),
+		Y: common.GetBigInt("90715709871810868701227023413915222907311739236101232519930156567199700809709", 10),
+	}
+	y, a1, b1, a2, b2, res, _ := Create1outof2ZKPNoVote(sender, vote1ZK.xG, vote1_yG, vote1ZK.W, vote1ZK.R, vote1ZK.D, vote1ZK.X)
+
+	res2 := Verify1outof2ZKP(sender, res, vote1ZK.xG, vote1_yG, y, a1, b1, a2, b2)
+	assert.True(t, res2)
+
+	sender2 := "bb2b24b84d6eee7895b20fdeed2a5b0735046706"
+	res2False := Verify1outof2ZKP(sender2, res, vote1ZK.xG, vote1_yG, y, a1, b1, a2, b2)
+	assert.False(t, res2False)
 }

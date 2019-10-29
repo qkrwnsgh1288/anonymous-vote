@@ -332,7 +332,7 @@ func Create1outof2ZKPNoVote(sender string, xG, yG Point, w, r2, d2, x *big.Int) 
 
 	// 5. b2
 	// Negate the 'y' co-ordinate of G
-	temp_affine1.X = Curve.Gx
+	temp_affine1.X.SetBytes(Curve.Gx.Bytes())
 	temp_affine1.Y.Sub(Curve.P, Curve.Gy)
 
 	// We need the public key y in affine co-ordinates
@@ -384,4 +384,93 @@ func Create1outof2ZKPNoVote(sender string, xG, yG Point, w, r2, d2, x *big.Int) 
 	res[3] = r2
 
 	return y, a1, b1, a2, b2, res, err
+}
+
+func Verify1outof2ZKP(sender string, params [4]*big.Int, xG, yG, y, a1, b1, a2, b2 Point) bool {
+	temp1 := MakeDefaultPoint()
+	temp2 := MakeDefaultPoint()
+	temp3 := MakeDefaultPoint()
+	mulTmp := MakeDefaultPoint()
+
+	// Make sure we are only dealing with valid public keys!
+	if !Curve.IsOnCurve(xG.X, xG.Y) || !Curve.IsOnCurve(yG.X, yG.Y) || !Curve.IsOnCurve(y.X, y.Y) || !Curve.IsOnCurve(a1.X, a1.Y) ||
+		!Curve.IsOnCurve(b1.X, b1.Y) || !Curve.IsOnCurve(a2.X, a2.Y) || !Curve.IsOnCurve(b2.X, b2.Y) {
+		return false
+	}
+
+	// Does c =? d1 + d2 (mod n)
+	hash := sha256.New()
+	hInput := common.GetBigInt(sender, 16).Bytes()
+	hInput = append(hInput, xG.X.Bytes()...)
+	hInput = append(hInput, xG.Y.Bytes()...)
+	hInput = append(hInput, y.X.Bytes()...)
+	hInput = append(hInput, y.Y.Bytes()...)
+	hInput = append(hInput, a1.X.Bytes()...)
+	hInput = append(hInput, a1.Y.Bytes()...)
+	hInput = append(hInput, b1.X.Bytes()...)
+	hInput = append(hInput, b1.Y.Bytes()...)
+	hInput = append(hInput, a2.X.Bytes()...)
+	hInput = append(hInput, a2.Y.Bytes()...)
+	hInput = append(hInput, b2.X.Bytes()...)
+	hInput = append(hInput, b2.Y.Bytes()...)
+	hash.Write(hInput)
+
+	md := hash.Sum(nil)
+	b_c := hex.EncodeToString(md)
+	c := common.GetBigInt(b_c, 16)
+
+	if c.Cmp(addMod(params[0], params[1], Curve.N)) != 0 {
+		return false
+	}
+
+	// a1 =? g^{r1} * x^{d1}
+	temp2.X, temp2.Y = Curve.ScalarBaseMult(params[2].Bytes())
+	mulTmp.X, mulTmp.Y = Curve.ScalarMult(xG.X, xG.Y, params[0].Bytes())
+	temp3.X, temp3.Y = Curve.Add(temp2.X, temp2.Y, mulTmp.X, mulTmp.Y)
+	if a1.X.Cmp(temp3.X) != 0 || a1.Y.Cmp(temp3.Y) != 0 {
+		return false
+	}
+
+	//b1 =? h^{r1} * y^{d1} (temp = affine 'y')
+	temp2.X, temp2.Y = Curve.ScalarMult(yG.X, yG.Y, params[2].Bytes())
+	mulTmp.X, mulTmp.Y = Curve.ScalarMult(y.X, y.Y, params[0].Bytes())
+	temp3.X, temp3.Y = Curve.Add(temp2.X, temp2.Y, mulTmp.X, mulTmp.Y)
+	if b1.X.Cmp(temp3.X) != 0 || b1.Y.Cmp(temp3.Y) != 0 {
+		return false
+	}
+
+	//a2 =? g^{r2} * x^{d2}
+	temp2.X, temp2.Y = Curve.ScalarBaseMult(params[3].Bytes())
+	mulTmp.X, mulTmp.Y = Curve.ScalarMult(xG.X, xG.Y, params[1].Bytes())
+	temp3.X, temp3.Y = Curve.Add(temp2.X, temp2.Y, mulTmp.X, mulTmp.Y)
+	if a2.X.Cmp(temp3.X) != 0 || a2.Y.Cmp(temp3.Y) != 0 {
+		return false
+	}
+
+	// Negate the 'y' co-ordinate of g
+	temp1.X.SetBytes(Curve.Gx.Bytes())
+	temp1.Y.Sub(Curve.P, Curve.Gy)
+
+	// get 'y'
+	temp3.X.SetBytes(y.X.Bytes())
+	temp3.Y.SetBytes(y.Y.Bytes())
+
+	// y-g
+	temp2.X, temp2.Y = Curve.Add(temp3.X, temp3.Y, temp1.X, temp1.Y)
+
+	// (y-g)^{d2}
+	temp1.X.SetBytes(temp2.X.Bytes())
+	temp1.Y.SetBytes(temp2.Y.Bytes())
+	temp2.X, temp2.Y = Curve.ScalarMult(temp1.X, temp1.Y, params[1].Bytes())
+
+	// Now... it is h^{r2} + temp2..
+	mulTmp.X, mulTmp.Y = Curve.ScalarMult(yG.X, yG.Y, params[3].Bytes())
+	temp3.X, temp3.Y = Curve.Add(mulTmp.X, mulTmp.Y, temp2.X, temp2.Y)
+
+	// Should all match up.
+	if b2.X.Cmp(temp3.X) != 0 || b2.Y.Cmp(temp3.Y) != 0 {
+		return false
+	}
+
+	return true
 }
