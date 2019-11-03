@@ -295,7 +295,7 @@ func TestRegister(t *testing.T) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////// 4. create/verify vote zkp //////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////// 4. create/verify vote zkp, sha3  //////////////////////////////////////////////////////////////////////////
 func TestCreate1outof2ZKPYesVote(t *testing.T) {
 	sender := "2a931B52132D9CA43D5355Fecc234FB7b1D02674"
 	vote1_yG := Point{
@@ -359,4 +359,16 @@ func TestVerify1outof2ZKP(t *testing.T) {
 	sender2 := "bb2b24b84d6eee7895b20fdeed2a5b0735046706"
 	res2False := Verify1outof2ZKP(sender2, res, vote1ZK.xG, vote1_yG, y, a1, b1, a2, b2)
 	assert.False(t, res2False)
+}
+func TestCommitToVote(t *testing.T) {
+	sender := "2a931B52132D9CA43D5355Fecc234FB7b1D02674"
+	vote1_yG := Point{
+		X: common.GetBigInt("13640588435166186727072570872841920017273057013114604476956539355021275854144", 10),
+		Y: common.GetBigInt("90715709871810868701227023413915222907311739236101232519930156567199700809709", 10),
+	}
+	y, a1, b1, a2, b2, res, _ := Create1outof2ZKPNoVote(sender, vote1ZK.xG, vote1_yG, vote1ZK.W, vote1ZK.R, vote1ZK.D, vote1ZK.X)
+
+	resHash := CommitToVote(sender, res, vote1ZK.xG, vote1_yG, y, a1, b1, a2, b2)
+
+	assert.Equal(t, "0bbfad23887733f92d568fcf4f89230376f0f759a4e3b81d75fd77fd9c1421c1", resHash)
 }

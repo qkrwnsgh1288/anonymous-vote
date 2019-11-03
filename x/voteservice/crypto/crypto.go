@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/common"
 	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/crypto/secp256k1"
+	"golang.org/x/crypto/sha3"
 	"math/big"
 )
 
@@ -473,4 +474,35 @@ func Verify1outof2ZKP(sender string, params [4]*big.Int, xG, yG, y, a1, b1, a2, 
 	}
 
 	return true
+}
+
+// keccak256 hash for a voters vote.
+func CommitToVote(sender string, params [4]*big.Int, xG, yG, y, a1, b1, a2, b2 Point) string {
+	hash := sha3.NewLegacyKeccak256()
+
+	hInput := common.GetBigInt(sender, 16).Bytes()
+	hInput = append(hInput, params[0].Bytes()...)
+	hInput = append(hInput, params[1].Bytes()...)
+	hInput = append(hInput, params[2].Bytes()...)
+	hInput = append(hInput, params[3].Bytes()...)
+	hInput = append(hInput, xG.X.Bytes()...)
+	hInput = append(hInput, xG.Y.Bytes()...)
+	hInput = append(hInput, yG.X.Bytes()...)
+	hInput = append(hInput, yG.Y.Bytes()...)
+	hInput = append(hInput, y.X.Bytes()...)
+	hInput = append(hInput, y.Y.Bytes()...)
+	hInput = append(hInput, a1.X.Bytes()...)
+	hInput = append(hInput, a1.Y.Bytes()...)
+	hInput = append(hInput, b1.X.Bytes()...)
+	hInput = append(hInput, b1.Y.Bytes()...)
+	hInput = append(hInput, a2.X.Bytes()...)
+	hInput = append(hInput, a2.Y.Bytes()...)
+	hInput = append(hInput, b2.X.Bytes()...)
+	hInput = append(hInput, b2.Y.Bytes()...)
+	hash.Write(hInput)
+
+	md := hash.Sum(nil)
+	b_c := hex.EncodeToString(md)
+
+	return b_c
 }
