@@ -62,10 +62,10 @@ type ZkInfo struct {
 
 type Voter struct {
 	Addr             string
-	RegisteredKey    Point // xG
-	ReconstructedKey Point // yG
-	Commitment       []byte
-	Vote             [2]*big.Int
+	RegisteredKey    Point    // xG
+	ReconstructedKey Point    // yG
+	Commitment       *big.Int // vote Hash
+	Vote             Point    // y ( Curve.ScalarMult(yG.X, yG.Y, x.Bytes()) )
 }
 
 func MakeVoter(addr string, registerKey Point) Voter {
@@ -73,7 +73,20 @@ func MakeVoter(addr string, registerKey Point) Voter {
 		Addr:             addr,
 		RegisteredKey:    registerKey,
 		ReconstructedKey: MakeDefaultPoint(),
+		Commitment:       new(big.Int),
+		Vote:             MakeDefaultPoint(),
 	}
+}
+func (v *Voter) SetReconstructedKey(yG Point) {
+	v.ReconstructedKey.X.SetBytes(yG.X.Bytes())
+	v.ReconstructedKey.Y.SetBytes(yG.Y.Bytes())
+}
+func (v *Voter) setCommitment(voteHash string) {
+	v.Commitment = common.GetBigInt(voteHash, 16)
+}
+func (v *Voter) setVote(y Point) {
+	v.Vote.X.SetBytes(y.X.Bytes())
+	v.Vote.Y.SetBytes(y.Y.Bytes())
 }
 
 // vG (blinding value), xG (public key), x (what we are proving)
