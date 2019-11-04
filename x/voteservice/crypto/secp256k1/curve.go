@@ -124,9 +124,9 @@ func ZForAffine(x, y *big.Int) *big.Int { //[]byte {
 }
 
 //TODO: double check if the function is okay
-// affineFromJacobian reverses the Jacobian transform. See the comment at the
+// AffineFromJacobian reverses the Jacobian transform. See the comment at the
 // top of the file.
-func (BitCurve *BitCurve) affineFromJacobian(x, y, z *big.Int) (xOut, yOut *big.Int) {
+func (BitCurve *BitCurve) AffineFromJacobian(x, y, z *big.Int) (xOut, yOut *big.Int) {
 	zinv := new(big.Int).ModInverse(z, BitCurve.P)
 	zinvsq := new(big.Int).Mul(zinv, zinv)
 
@@ -141,7 +141,7 @@ func (BitCurve *BitCurve) affineFromJacobian(x, y, z *big.Int) (xOut, yOut *big.
 // Add returns the sum of (x1,y1) and (x2,y2)
 func (BitCurve *BitCurve) Add(x1, y1, x2, y2 *big.Int) (*big.Int, *big.Int) {
 	z := new(big.Int).SetInt64(1)
-	return BitCurve.affineFromJacobian(BitCurve.addJacobian(x1, y1, z, x2, y2, z))
+	return BitCurve.AffineFromJacobian(BitCurve.addJacobian(x1, y1, z, x2, y2, z))
 }
 
 // addJacobian takes two points in Jacobian coordinates, (x1, y1, z1) and
@@ -212,7 +212,7 @@ func (BitCurve *BitCurve) addJacobian(x1, y1, z1, x2, y2, z2 *big.Int) (*big.Int
 // Double returns 2*(x,y)
 func (BitCurve *BitCurve) Double(x1, y1 *big.Int) (*big.Int, *big.Int) {
 	z1 := new(big.Int).SetInt64(1)
-	return BitCurve.affineFromJacobian(BitCurve.doubleJacobian(x1, y1, z1))
+	return BitCurve.AffineFromJacobian(BitCurve.doubleJacobian(x1, y1, z1))
 }
 
 // doubleJacobian takes a point in Jacobian coordinates, (x, y, z), and

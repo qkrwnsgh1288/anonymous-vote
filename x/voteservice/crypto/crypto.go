@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/common"
 	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/crypto/secp256k1"
 	"golang.org/x/crypto/sha3"
@@ -261,7 +262,7 @@ func FinishRegistrationPhase() error {
 }
 
 // random 'W', 'r1', 'd1'
-func Create1outof2ZKPYesVote(sender string, xG, yG Point, w, r1, d1, x *big.Int) (y, a1, b1, a2, b2 Point, res [4]*big.Int, err error) {
+func Create1outof2ZKPYesVote(sender string, xG, yG Point, w, r1, d1, x *big.Int) (y, a1, b1, a2, b2 Point, params [4]*big.Int, err error) {
 	// 1. y = h^{X} * g
 	y.X, y.Y = Curve.ScalarMult(yG.X, yG.Y, x.Bytes())
 	y.X, y.Y = Curve.Add(y.X, y.Y, Curve.Gx, Curve.Gy)
@@ -316,16 +317,16 @@ func Create1outof2ZKPYesVote(sender string, xG, yG Point, w, r1, d1, x *big.Int)
 	// r2 = w - (x * d2)
 	r2 := subMod(w, mulMod(x, d2, Curve.N), Curve.N)
 
-	res[0] = d1
-	res[1] = d2
-	res[2] = r1
-	res[3] = r2
+	params[0] = d1
+	params[1] = d2
+	params[2] = r1
+	params[3] = r2
 
-	return y, a1, b1, a2, b2, res, err
+	return y, a1, b1, a2, b2, params, err
 }
 
 // random 'W', 'r2', 'd2'
-func Create1outof2ZKPNoVote(sender string, xG, yG Point, w, r2, d2, x *big.Int) (y, a1, b1, a2, b2 Point, res [4]*big.Int, err error) {
+func Create1outof2ZKPNoVote(sender string, xG, yG Point, w, r2, d2, x *big.Int) (y, a1, b1, a2, b2 Point, params [4]*big.Int, err error) {
 	temp_affine1 := MakeDefaultPoint()
 	temp_affine2 := MakeDefaultPoint()
 	temp1 := MakeDefaultPoint()
@@ -392,14 +393,15 @@ func Create1outof2ZKPNoVote(sender string, xG, yG Point, w, r2, d2, x *big.Int) 
 	// r1 = w - (x * d1)
 	r1 := subMod(w, mulMod(x, d1, Curve.N), Curve.N)
 
-	res[0] = d1
-	res[1] = d2
-	res[2] = r1
-	res[3] = r2
+	params[0] = d1
+	params[1] = d2
+	params[2] = r1
+	params[3] = r2
 
-	return y, a1, b1, a2, b2, res, err
+	return y, a1, b1, a2, b2, params, err
 }
 
+// verify about vote
 func Verify1outof2ZKP(sender string, params [4]*big.Int, xG, yG, y, a1, b1, a2, b2 Point) bool {
 	temp1 := MakeDefaultPoint()
 	temp2 := MakeDefaultPoint()
@@ -518,4 +520,57 @@ func CommitToVote(sender string, params [4]*big.Int, xG, yG, y, a1, b1, a2, b2 P
 	b_c := hex.EncodeToString(md)
 
 	return b_c
+}
+
+// get yes vote count
+func ComputeTally() (int, error) {
+	temp := MakeDefaultJacobianPoint()
+	vote := MakeDefaultPoint()
+	G := MakeDefaultPoint()
+
+	G.X.SetBytes(Curve.Gx.Bytes())
+	G.Y.SetBytes(Curve.Gy.Bytes())
+
+	tempCurve := MakeDefaultPoint()
+	tempCurve.X.SetBytes(Curve.Gx.Bytes())
+	tempCurve.Y.SetBytes(Curve.Gy.Bytes())
+
+	// Sum all votes
+	for i := 0; i < Totalregistered; i++ {
+		vote.X.SetBytes(Voters[i].Vote.X.Bytes())
+		vote.Y.SetBytes(Voters[i].Vote.Y.Bytes())
+
+		if i == 0 {
+			temp.X.SetBytes(vote.X.Bytes())
+			temp.Y.SetBytes(vote.Y.Bytes())
+			temp.Z = big.NewInt(1)
+		} else {
+			AddMixedM(&temp, vote)
+		}
+	}
+
+	// Each vote is represented by a G.
+	// If there are no votes... then it is 0G = (0,0)...
+	if temp.X.Cmp(big.NewInt(0)) == 0 {
+		fmt.Println("temp.X = ", 0)
+		return 0, nil
+	} else {
+		ToZ1(&temp, Curve.P)
+
+		tempG := MakeDefaultJacobianPoint()
+		tempG.X.SetBytes(G.X.Bytes())
+		tempG.Y.SetBytes(G.Y.Bytes())
+		tempG.Z = big.NewInt(1)
+
+		// Start adding 'G' and looking for a match
+		for i := 1; i <= Totalregistered; i++ {
+			if temp.X.Cmp(tempG.X) == 0 {
+				return i, nil
+			}
+			//tempG.X, tempG.Y = Curve.Add(tempG.X, tempG.Y, Curve.Gx, Curve.Gy)
+			AddMixedM(&tempG, G)
+			ToZ1(&tempG, Curve.P)
+		}
+	}
+	return 0, errors.New("something bad happened")
 }

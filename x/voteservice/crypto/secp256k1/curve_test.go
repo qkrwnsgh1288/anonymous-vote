@@ -23,17 +23,29 @@ func TestAdd(t *testing.T) {
 	y2 := common.GetBigInt("51103279871057056523744718969849587301335546334788824374456705394361157035715", 10)
 	y3 := common.GetBigInt("1", 10)
 	a, b, c := theCurve.addJacobian(x1, x2, x3, y1, y2, y3)
+	fmt.Println(a, b, c)
 
-	res1, res2 := theCurve.affineFromJacobian(a, b, c)
+	res1, res2 := theCurve.AffineFromJacobian(a, b, c)
 
 	assert.Equal(t, "19726021177552888194148621436129232937104234324513758427865268224158101547130", res1.String())
 	assert.Equal(t, "50952383343742199881927221996840986713139267241507858986150651430342248986684", res2.String())
 }
+func TestAdd2(t *testing.T) {
+	x := big.NewInt(3)
+	y := big.NewInt(5)
+	z := big.NewInt(1)
+	x1 := big.NewInt(3)
+	y1 := big.NewInt(5)
+	z1 := big.NewInt(1)
+
+	a, b, c := theCurve.addJacobian(x, y, z, x1, y1, z1)
+	fmt.Println(a, b, c)
+}
 
 func TestDouble(t *testing.T) {
-	inputA := common.GetBigInt("1", 10)
-	inputB := common.GetBigInt("2", 10)
-	inputC := common.GetBigInt("3", 10)
+	inputA := big.NewInt(1) //common.GetBigInt("1", 10)
+	inputB := big.NewInt(2) //common.GetBigInt("2", 10)
+	inputC := big.NewInt(3) //common.GetBigInt("3", 10)
 	a, b, c := theCurve.doubleJacobian(inputA, inputB, inputC)
 	fmt.Println(a, b, c)
 }

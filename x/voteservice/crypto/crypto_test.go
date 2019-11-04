@@ -294,7 +294,7 @@ func TestRegister(t *testing.T) {
 	assert.Equal(t, "16070335387338018856501682106237699376075221278867300502691659950109073760271", Voters[4].ReconstructedKey.Y.String())
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// 4. create/verify vote zkp, sha3  //////////////////////////////////////////////////////////////////////////
 func TestCreate1outof2ZKPYesVote(t *testing.T) {
 	sender := "2a931B52132D9CA43D5355Fecc234FB7b1D02674"
@@ -327,7 +327,7 @@ func TestCreate1outof2ZKPNoVote(t *testing.T) {
 		X: common.GetBigInt("13640588435166186727072570872841920017273057013114604476956539355021275854144", 10),
 		Y: common.GetBigInt("90715709871810868701227023413915222907311739236101232519930156567199700809709", 10),
 	}
-	y, a1, b1, a2, b2, res, _ := Create1outof2ZKPNoVote(sender, vote1ZK.xG, vote1_yG, vote1ZK.W, vote1ZK.R, vote1ZK.D, vote1ZK.X)
+	y, a1, b1, a2, b2, res, err := Create1outof2ZKPNoVote(sender, vote1ZK.xG, vote1_yG, vote1ZK.W, vote1ZK.R, vote1ZK.D, vote1ZK.X)
 
 	assert.Equal(t, "72953880350551877812116699698054311307442693874049328432342187152642492201458", y.X.String())
 	assert.Equal(t, "51953711960569978779353915490774224106912892181838820017263325931010782532811", y.Y.String())
@@ -344,6 +344,7 @@ func TestCreate1outof2ZKPNoVote(t *testing.T) {
 	assert.Equal(t, "63472464783107388493770567796117006062886472127577491241883308220111272611979", res[1].String())
 	assert.Equal(t, "30596339251246178808891678424758772629979199048682215951963461404711905037241", res[2].String())
 	assert.Equal(t, "50335626772706697871408471165498611599437960211637817517623137749599062304789", res[3].String())
+	assert.Equal(t, nil, err)
 }
 func TestVerify1outof2ZKP(t *testing.T) {
 	sender := "2a931B52132D9CA43D5355Fecc234FB7b1D02674"
@@ -351,13 +352,13 @@ func TestVerify1outof2ZKP(t *testing.T) {
 		X: common.GetBigInt("13640588435166186727072570872841920017273057013114604476956539355021275854144", 10),
 		Y: common.GetBigInt("90715709871810868701227023413915222907311739236101232519930156567199700809709", 10),
 	}
-	y, a1, b1, a2, b2, res, _ := Create1outof2ZKPNoVote(sender, vote1ZK.xG, vote1_yG, vote1ZK.W, vote1ZK.R, vote1ZK.D, vote1ZK.X)
+	y, a1, b1, a2, b2, params, _ := Create1outof2ZKPNoVote(sender, vote1ZK.xG, vote1_yG, vote1ZK.W, vote1ZK.R, vote1ZK.D, vote1ZK.X)
 
-	res2 := Verify1outof2ZKP(sender, res, vote1ZK.xG, vote1_yG, y, a1, b1, a2, b2)
+	res2 := Verify1outof2ZKP(sender, params, vote1ZK.xG, vote1_yG, y, a1, b1, a2, b2)
 	assert.True(t, res2)
 
 	sender2 := "bb2b24b84d6eee7895b20fdeed2a5b0735046706"
-	res2False := Verify1outof2ZKP(sender2, res, vote1ZK.xG, vote1_yG, y, a1, b1, a2, b2)
+	res2False := Verify1outof2ZKP(sender2, params, vote1ZK.xG, vote1_yG, y, a1, b1, a2, b2)
 	assert.False(t, res2False)
 }
 func TestCommitToVote(t *testing.T) {
@@ -366,9 +367,78 @@ func TestCommitToVote(t *testing.T) {
 		X: common.GetBigInt("13640588435166186727072570872841920017273057013114604476956539355021275854144", 10),
 		Y: common.GetBigInt("90715709871810868701227023413915222907311739236101232519930156567199700809709", 10),
 	}
-	y, a1, b1, a2, b2, res, _ := Create1outof2ZKPNoVote(sender, vote1ZK.xG, vote1_yG, vote1ZK.W, vote1ZK.R, vote1ZK.D, vote1ZK.X)
+	y, a1, b1, a2, b2, params, _ := Create1outof2ZKPNoVote(sender, vote1ZK.xG, vote1_yG, vote1ZK.W, vote1ZK.R, vote1ZK.D, vote1ZK.X)
 
-	resHash := CommitToVote(sender, res, vote1ZK.xG, vote1_yG, y, a1, b1, a2, b2)
+	resHash := CommitToVote(sender, params, vote1ZK.xG, vote1_yG, y, a1, b1, a2, b2)
 
 	assert.Equal(t, "0bbfad23887733f92d568fcf4f89230376f0f759a4e3b81d75fd77fd9c1421c1", resHash)
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////// 4. tally  //////////////////////////////////////////////////////////////////////////
+func TestComputeTally(t *testing.T) {
+	addr1 := "2a931b52132d9ca43d5355fecc234fb7b1d02674"
+	addr2 := "bb2b24b84d6eee7895b20fdeed2a5b0735046706"
+	addr3 := "411609f475dfa35e931bf0f5b59ae933380756a6"
+	addr4 := "4851d64bc9cd1817561e113212a1890bd3d84eab"
+	addr5 := "c7dbe023afb9c66eb9465e46f3d4a8e3f3da8b30"
+
+	v1_r, v1_vG, _ := CreateZKP(addr1, vote1ZK.X, vote1ZK.V, vote1ZK.xG)
+	v2_r, v2_vG, _ := CreateZKP(addr2, vote2ZK.X, vote2ZK.V, vote2ZK.xG)
+	v3_r, v3_vG, _ := CreateZKP(addr3, vote3ZK.X, vote3ZK.V, vote3ZK.xG)
+	v4_r, v4_vG, _ := CreateZKP(addr4, vote4ZK.X, vote4ZK.V, vote4ZK.xG)
+	v5_r, v5_vG, _ := CreateZKP(addr5, vote5ZK.X, vote5ZK.V, vote5ZK.xG)
+
+	assert.True(t, VerifyZKP(addr1, vote1ZK.xG, v1_r, v1_vG))
+	assert.True(t, VerifyZKP(addr2, vote2ZK.xG, v2_r, v2_vG))
+	assert.True(t, VerifyZKP(addr3, vote3ZK.xG, v3_r, v3_vG))
+	assert.True(t, VerifyZKP(addr4, vote4ZK.xG, v4_r, v4_vG))
+	assert.True(t, VerifyZKP(addr5, vote5ZK.xG, v5_r, v5_vG))
+
+	_ = Register(addr1, vote1ZK.xG, v1_vG, v1_r)
+	_ = Register(addr2, vote2ZK.xG, v2_vG, v2_r)
+	_ = Register(addr3, vote3ZK.xG, v3_vG, v3_r)
+	_ = Register(addr4, vote4ZK.xG, v4_vG, v4_r)
+	_ = Register(addr5, vote5ZK.xG, v5_vG, v5_r)
+
+	assert.Equal(t, 5, Totalregistered)
+
+	err := FinishRegistrationPhase()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	y, a1, b1, a2, b2, params, _ := Create1outof2ZKPYesVote(addr1, vote1ZK.xG, Voters[0].ReconstructedKey, vote1ZK.W, vote1ZK.R, vote1ZK.D, vote1ZK.X)
+	verifyAddr1 := Verify1outof2ZKP(addr1, params, vote1ZK.xG, Voters[0].ReconstructedKey, y, a1, b1, a2, b2)
+	assert.True(t, verifyAddr1)
+	Voters[0].setCommitment(CommitToVote(addr1, params, vote1ZK.xG, Voters[0].ReconstructedKey, y, a1, b1, a2, b2)) // todo: consider
+	Voters[0].setVote(y)
+
+	y, a1, b1, a2, b2, params, _ = Create1outof2ZKPNoVote(addr2, vote2ZK.xG, Voters[1].ReconstructedKey, vote2ZK.W, vote2ZK.R, vote2ZK.D, vote2ZK.X)
+	verifyAddr2 := Verify1outof2ZKP(addr2, params, vote2ZK.xG, Voters[1].ReconstructedKey, y, a1, b1, a2, b2)
+	assert.True(t, verifyAddr2)
+	Voters[1].setCommitment(CommitToVote(addr2, params, vote2ZK.xG, Voters[1].ReconstructedKey, y, a1, b1, a2, b2)) // todo: consider
+	Voters[1].setVote(y)
+
+	y, a1, b1, a2, b2, params, _ = Create1outof2ZKPYesVote(addr3, vote3ZK.xG, Voters[2].ReconstructedKey, vote3ZK.W, vote3ZK.R, vote3ZK.D, vote3ZK.X)
+	verifyAddr3 := Verify1outof2ZKP(addr3, params, vote3ZK.xG, Voters[2].ReconstructedKey, y, a1, b1, a2, b2)
+	assert.True(t, verifyAddr3)
+	Voters[2].setCommitment(CommitToVote(addr3, params, vote3ZK.xG, Voters[2].ReconstructedKey, y, a1, b1, a2, b2)) // todo: consider
+	Voters[2].setVote(y)
+
+	y, a1, b1, a2, b2, params, _ = Create1outof2ZKPNoVote(addr4, vote4ZK.xG, Voters[3].ReconstructedKey, vote4ZK.W, vote4ZK.R, vote4ZK.D, vote4ZK.X)
+	verifyAddr4 := Verify1outof2ZKP(addr4, params, vote4ZK.xG, Voters[3].ReconstructedKey, y, a1, b1, a2, b2)
+	assert.True(t, verifyAddr4)
+	Voters[3].setCommitment(CommitToVote(addr4, params, vote4ZK.xG, Voters[3].ReconstructedKey, y, a1, b1, a2, b2)) // todo: consider
+	Voters[3].setVote(y)
+
+	y, a1, b1, a2, b2, params, _ = Create1outof2ZKPNoVote(addr5, vote5ZK.xG, Voters[4].ReconstructedKey, vote5ZK.W, vote5ZK.R, vote5ZK.D, vote5ZK.X)
+	verifyAddr5 := Verify1outof2ZKP(addr5, params, vote5ZK.xG, Voters[4].ReconstructedKey, y, a1, b1, a2, b2)
+	assert.True(t, verifyAddr5)
+	Voters[4].setCommitment(CommitToVote(addr5, params, vote5ZK.xG, Voters[4].ReconstructedKey, y, a1, b1, a2, b2)) // todo: consider
+	Voters[4].setVote(y)
+
+	res, err := ComputeTally()
+	assert.Equal(t, 2, res)
+	assert.Equal(t, nil, err)
 }
