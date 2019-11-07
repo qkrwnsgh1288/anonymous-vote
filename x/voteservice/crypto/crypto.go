@@ -110,16 +110,15 @@ func CreateZKP(senderAddr string, x, v *big.Int, xG Point) (r *big.Int, vG Jacob
 
 	// Get c = H(g, g^{x}, g^{v});
 	hash := sha256.New()
-	sender := common.GetBigInt(senderAddr, 16) // todo: senderAddr check
+	//sender := common.GetBigInt(senderAddr, 16)
 
-	hashInput := sender.Bytes()
+	hashInput := []byte(senderAddr)
 	hashInput = append(hashInput, Curve.Gx.Bytes()...)
 	hashInput = append(hashInput, Curve.Gy.Bytes()...)
 	hashInput = append(hashInput, xG.X.Bytes()...)
 	hashInput = append(hashInput, xG.Y.Bytes()...)
 	hashInput = append(hashInput, vG.X.Bytes()...)
 	hashInput = append(hashInput, vG.Y.Bytes()...)
-	//hashInput = append(hashInput, vG.Z...)
 	hashInput = append(hashInput, vG.Z.Bytes()...)
 	hash.Write(hashInput)
 
@@ -156,16 +155,15 @@ func VerifyZKP(senderAddr string, xG Point, r *big.Int, vG JacobianPoint) bool {
 
 	// Get c = H(g, g^{x}, g^{v});
 	hash := sha256.New()
-	sender := common.GetBigInt(senderAddr, 16) // todo: senderAddr check
+	//sender := common.GetBigInt(senderAddr, 16)
 
-	hashInput := sender.Bytes()
+	hashInput := []byte(senderAddr)
 	hashInput = append(hashInput, Curve.Gx.Bytes()...)
 	hashInput = append(hashInput, Curve.Gy.Bytes()...)
 	hashInput = append(hashInput, xG.X.Bytes()...)
 	hashInput = append(hashInput, xG.Y.Bytes()...)
 	hashInput = append(hashInput, vG.X.Bytes()...)
 	hashInput = append(hashInput, vG.Y.Bytes()...)
-	//hashInput = append(hashInput, vG.Z...)
 	hashInput = append(hashInput, vG.Z.Bytes()...)
 	hash.Write(hashInput)
 
@@ -292,7 +290,8 @@ func Create1outof2ZKPYesVote(sender string, xG, yG Point, w, r1, d1, x *big.Int)
 	// Get c = H(id, xG, Y, a1, b1, a2, b2)
 	// id is H(round, voter_index, voter_address)...
 	hash := sha256.New()
-	hInput := common.GetBigInt(sender, 16).Bytes()
+	//hInput := common.GetBigInt(sender, 16).Bytes()
+	hInput := []byte(sender)
 	hInput = append(hInput, xG.X.Bytes()...)
 	hInput = append(hInput, xG.Y.Bytes()...)
 	hInput = append(hInput, y.X.Bytes()...)
@@ -368,7 +367,8 @@ func Create1outof2ZKPNoVote(sender string, xG, yG Point, w, r2, d2, x *big.Int) 
 
 	// Get c = H(i, xG, Y, a1, b1, a2, b2)
 	hash := sha256.New()
-	hInput := common.GetBigInt(sender, 16).Bytes()
+	//hInput := common.GetBigInt(sender, 16).Bytes()
+	hInput := []byte(sender)
 	hInput = append(hInput, xG.X.Bytes()...)
 	hInput = append(hInput, xG.Y.Bytes()...)
 	hInput = append(hInput, y.X.Bytes()...)
@@ -416,7 +416,8 @@ func Verify1outof2ZKP(sender string, params [4]*big.Int, xG, yG, y, a1, b1, a2, 
 
 	// Does c =? d1 + d2 (mod n)
 	hash := sha256.New()
-	hInput := common.GetBigInt(sender, 16).Bytes()
+	//hInput := common.GetBigInt(sender, 16).Bytes()
+	hInput := []byte(sender)
 	hInput = append(hInput, xG.X.Bytes()...)
 	hInput = append(hInput, xG.Y.Bytes()...)
 	hInput = append(hInput, y.X.Bytes()...)
@@ -495,7 +496,8 @@ func Verify1outof2ZKP(sender string, params [4]*big.Int, xG, yG, y, a1, b1, a2, 
 func CommitToVote(sender string, params [4]*big.Int, xG, yG, y, a1, b1, a2, b2 Point) string {
 	hash := sha3.NewLegacyKeccak256()
 
-	hInput := common.GetBigInt(sender, 16).Bytes()
+	//hInput := common.GetBigInt(sender, 16).Bytes()
+	hInput := []byte(sender)
 	hInput = append(hInput, params[0].Bytes()...)
 	hInput = append(hInput, params[1].Bytes()...)
 	hInput = append(hInput, params[2].Bytes()...)

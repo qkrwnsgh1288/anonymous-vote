@@ -377,11 +377,11 @@ func TestCommitToVote(t *testing.T) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// 4. tally  //////////////////////////////////////////////////////////////////////////
 func TestComputeTally(t *testing.T) {
-	addr1 := "2a931b52132d9ca43d5355fecc234fb7b1d02674"
-	addr2 := "bb2b24b84d6eee7895b20fdeed2a5b0735046706"
-	addr3 := "411609f475dfa35e931bf0f5b59ae933380756a6"
-	addr4 := "4851d64bc9cd1817561e113212a1890bd3d84eab"
-	addr5 := "c7dbe023afb9c66eb9465e46f3d4a8e3f3da8b30"
+	addr1 := "cosmos152galq9j5764sggk85z504k50xuq788f9ua85f"
+	addr2 := "cosmos1c8mpkaztknquuvfu2lt34939nzgzkg4q799kf3"
+	addr3 := "cosmos1ed3mttdadlc2xwf7ac98ptrt7kg274uswlj900"
+	addr4 := "cosmos1s0xccm3pf9uq0zpasap5pypav2tp0hnqezaqwm"
+	addr5 := "cosmos1k07txk9c2yex9m9fwzch2x7hd87qg08kmygd8m"
 
 	v1_r, v1_vG, _ := CreateZKP(addr1, vote1ZK.X, vote1ZK.V, vote1ZK.xG)
 	v2_r, v2_vG, _ := CreateZKP(addr2, vote2ZK.X, vote2ZK.V, vote2ZK.xG)
