@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/cosmos/cosmos-sdk v0.37.0
 	github.com/go-logfmt/logfmt v0.4.0 // indirect
+	github.com/golang/protobuf v1.3.2
 	github.com/gorilla/mux v1.7.0
 	github.com/mattn/go-isatty v0.0.7 // indirect
 	github.com/prometheus/procfs v0.0.0-20190328153300-af7bedc223fb // indirect

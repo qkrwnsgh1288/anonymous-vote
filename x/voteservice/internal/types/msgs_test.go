@@ -3,6 +3,8 @@ package types
 import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
+	oproto "github.com/golang/protobuf/proto"
+	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/internal/types/proto"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
@@ -55,4 +57,31 @@ func TestMarshal(t *testing.T) {
 	var b TestStruct
 	testCdc.MustUnmarshalBinaryBare(encodedData, &b)
 	fmt.Println("b=", b)
+}
+
+func TestProto(t *testing.T) {
+	msg := MsgMakeAgenda{
+		AgendaTopic:   "A",
+		AgendaContent: "B",
+		Test:          make(map[string]bool),
+	}
+	msg.Test["AAA"] = true
+
+	msgProto := proto.MsgMakeAgenda{
+		AgendaTopic:   msg.AgendaTopic,
+		AgendaContent: msg.AgendaContent,
+		Test:          msg.Test,
+	}
+	fmt.Println(msgProto)
+
+	b, err := oproto.Marshal(&msgProto)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(b)
+
+	var de proto.MsgMakeAgenda
+	err = oproto.Unmarshal(b, &de)
+	fmt.Println(de)
+
 }

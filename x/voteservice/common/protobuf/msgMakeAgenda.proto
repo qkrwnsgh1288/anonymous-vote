@@ -1,0 +1,13 @@
+syntax = "proto3";
+package types;
+
+option go_package = "github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/internal/types/proto";
+
+message MsgMakeAgenda{
+    bytes agendaProposer = 1;
+    string agendaTopic = 2;
+    string agendaContent = 3;
+    repeated string whiteList = 4;
+    repeated string voteCheckList = 5;
+    map<string, bool> test = 6;
+}

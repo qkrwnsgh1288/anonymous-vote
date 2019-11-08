@@ -2,6 +2,8 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	oproto "github.com/golang/protobuf/proto"
+	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/internal/types/proto"
 )
 
 const RouterKey = ModuleName // this was defined in your key.go file
@@ -20,6 +22,7 @@ type MsgMakeAgenda struct {
 	WhiteList     []string `json:"whitelist"`
 	VoteCheckList []string `json:"vote_checklist"`
 	//WhiteList     map[string]bool `json:"whitelist"`
+	Test map[string]bool `json:"test"`
 }
 
 func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaContent string, whiteList []string) MsgMakeAgenda {
@@ -31,6 +34,8 @@ func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaC
 	for i := 0; i < len(whiteList); i++ {
 		voteCheckList = append(voteCheckList, "empty")
 	}
+	test := make(map[string]bool)
+	test["A"] = true
 
 	return MsgMakeAgenda{
 		AgendaProposer: agendaProposer,
@@ -38,6 +43,17 @@ func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaC
 		AgendaContent:  agendaContent,
 		WhiteList:      whiteList,
 		VoteCheckList:  voteCheckList,
+		Test:           test,
+	}
+}
+func (msg MsgMakeAgenda) GetPb() proto.MsgMakeAgenda {
+	return proto.MsgMakeAgenda{
+		AgendaProposer: msg.AgendaProposer,
+		AgendaTopic:    msg.AgendaTopic,
+		AgendaContent:  msg.AgendaContent,
+		WhiteList:      msg.WhiteList,
+		VoteCheckList:  msg.VoteCheckList,
+		Test:           msg.Test,
 	}
 }
 func (msg MsgMakeAgenda) Route() string { return RouterKey }
@@ -56,7 +72,13 @@ func (msg MsgMakeAgenda) ValidateBasic() sdk.Error {
 	return nil
 }
 func (msg MsgMakeAgenda) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	//return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+	pb := msg.GetPb()
+	b, err := oproto.Marshal(&pb)
+	if err != nil {
+		panic(err)
+	}
+	return b
 }
 func (msg MsgMakeAgenda) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.AgendaProposer}

@@ -16,10 +16,13 @@ type Agenda struct {
 
 	Progress string `json:"progress"`
 	//WhiteList map[string]bool  `json:"whitelist"`
+	Test map[string]bool `json:"test"`
 }
 
 func NewAgenda() Agenda {
-	return Agenda{}
+	return Agenda{
+		Test: make(map[string]bool),
+	}
 }
 
 func (a Agenda) String() string {
