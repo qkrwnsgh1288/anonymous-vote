@@ -63,10 +63,10 @@ type ZkInfo struct {
 
 type Voter struct {
 	Addr             string
-	RegisteredKey    Point    // xG
-	ReconstructedKey Point    // yG
-	Commitment       *big.Int // vote Hash
-	Vote             Point    // y ( Curve.ScalarMult(yG.X, yG.Y, x.Bytes()) )
+	RegisteredKey    Point  // xG
+	ReconstructedKey Point  // yG
+	Commitment       string // vote Hash
+	Vote             Point  // y ( Curve.ScalarMult(yG.X, yG.Y, x.Bytes()) )
 }
 
 func MakeVoter(addr string, registerKey Point) Voter {
@@ -74,8 +74,8 @@ func MakeVoter(addr string, registerKey Point) Voter {
 		Addr:             addr,
 		RegisteredKey:    registerKey,
 		ReconstructedKey: MakeDefaultPoint(),
-		Commitment:       new(big.Int),
-		Vote:             MakeDefaultPoint(),
+		//Commitment:       new(big.Int),
+		Vote: MakeDefaultPoint(),
 	}
 }
 func (v *Voter) SetReconstructedKey(yG Point) {
@@ -83,7 +83,7 @@ func (v *Voter) SetReconstructedKey(yG Point) {
 	v.ReconstructedKey.Y.SetBytes(yG.Y.Bytes())
 }
 func (v *Voter) setCommitment(voteHash string) {
-	v.Commitment = common.GetBigInt(voteHash, 16)
+	v.Commitment = voteHash //common.GetBigInt(voteHash, 16)
 }
 func (v *Voter) setVote(y Point) {
 	v.Vote.X.SetBytes(y.X.Bytes())
