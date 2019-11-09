@@ -24,16 +24,17 @@ type StringPoint struct {
 // MsgMakeAgenda
 type MsgMakeAgenda struct {
 	AgendaProposer sdk.AccAddress `json:"agenda_proposer"`
+	AgendaTopic    string         `json:"agenda_topic"`
+	AgendaContent  string         `json:"agenda_content"`
 
-	AgendaTopic   string   `json:"agenda_topic"`
-	AgendaContent string   `json:"agenda_content"`
 	SetupList     []string `json:"setuplist"`
 	VoteCheckList []string `json:"vote_checklist"`
 
 	State            crypto.State  `json:"state"`
+	RegisterList     []string      `json:"registerlist"`
 	RegisteredKey    []StringPoint `json:"registered_key"`
 	ReconstructedKey []StringPoint `json:"reconstructed_key"`
-	Commitment       string        `json:"commitment"`
+	Commitment       []string      `json:"commitment"`
 	Vote             []StringPoint `json:"vote"`
 }
 
@@ -41,6 +42,7 @@ func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaC
 	var voteCheckList []string
 	for i := 0; i < len(whiteList); i++ {
 		voteCheckList = append(voteCheckList, "empty")
+
 	}
 	//a := make([]StringPoint, 0)
 	//a = append(a, StringPoint{"x1", "y1"})
@@ -48,13 +50,14 @@ func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaC
 
 	return MsgMakeAgenda{
 		AgendaProposer: agendaProposer,
+		AgendaTopic:    agendaTopic,
+		AgendaContent:  agendaContent,
 
-		AgendaTopic:   agendaTopic,
-		AgendaContent: agendaContent,
 		SetupList:     whiteList,
 		VoteCheckList: voteCheckList,
 
 		State: crypto.SETUP,
+		//RegisterList: make([]string, 0),
 		//RegisteredKey:  make([]StringPoint, 0),
 	}
 }

@@ -64,7 +64,7 @@ func MakeDefaultJacobianPoint() JacobianPoint {
 
 type ZkInfo struct {
 	X  *big.Int // private key
-	xG Point    // public key
+	XG Point    // public key
 	V  *big.Int // random nonce for zkp
 	W  *big.Int // random nonce for 1outof2 zkp
 	R  *big.Int // 1 or 2, random nonce for 1outof2 zkp
@@ -73,7 +73,7 @@ type ZkInfo struct {
 
 type Voter struct {
 	Addr             string
-	RegisteredKey    Point  // xG
+	RegisteredKey    Point  // XG
 	ReconstructedKey Point  // yG
 	Commitment       string // vote Hash
 	Vote             Point  // y ( Curve.ScalarMult(yG.X, yG.Y, x.Bytes()) )
@@ -100,7 +100,7 @@ func (v *Voter) setVote(y Point) {
 	v.Vote.Y.SetBytes(y.Y.Bytes())
 }
 
-// vG (blinding value), xG (public key), x (what we are proving)
+// vG (blinding value), XG (public key), x (what we are proving)
 // c = H(g, g^{v}, g^{x});
 // r = v - xz (mod p);
 // return(r,vG)
@@ -110,7 +110,7 @@ func CreateZKP(senderAddr string, x, v *big.Int, xG Point) (r *big.Int, vG Jacob
 	G.Y = Curve.Gy
 
 	if !Curve.IsOnCurve(xG.X, xG.Y) {
-		return r, vG, errors.New("error occured in CreateZKP: xG is not pubKey")
+		return r, vG, errors.New("error occured in CreateZKP: XG is not pubKey")
 	}
 
 	// Get g^{v}
@@ -151,7 +151,7 @@ func CreateZKP(senderAddr string, x, v *big.Int, xG Point) (r *big.Int, vG Jacob
 	return r, vG, nil
 }
 
-// Parameters xG, r where r = v - xc, and vG.
+// Parameters XG, r where r = v - xc, and vG.
 // Verify that vG = rG + xcG!
 func VerifyZKP(senderAddr string, xG Point, r *big.Int, vG JacobianPoint) bool {
 	var G Point
@@ -205,7 +205,7 @@ func Register(senderAddr string, xG Point, vG JacobianPoint, r *big.Int) error {
 	// todo:  dead line check
 	// todo: white list check
 	Voters = append(Voters, MakeVoter(senderAddr, xG))
-	//Voters[Totalregistered] = MakeVoter(senderAddr, xG)
+	//Voters[Totalregistered] = MakeVoter(senderAddr, XG)
 	Totalregistered += 1
 
 	return nil
@@ -297,7 +297,7 @@ func Create1outof2ZKPYesVote(sender string, xG, yG Point, w, r1, d1, x *big.Int)
 	// 5. b2 = h^{w} (where h = g^{y})
 	b2.X, b2.Y = Curve.ScalarMult(yG.X, yG.Y, w.Bytes())
 
-	// Get c = H(id, xG, Y, a1, b1, a2, b2)
+	// Get c = H(id, XG, Y, a1, b1, a2, b2)
 	// id is H(round, voter_index, voter_address)...
 	hash := sha256.New()
 	//hInput := common.GetBigInt(sender, 16).Bytes()
@@ -375,7 +375,7 @@ func Create1outof2ZKPNoVote(sender string, xG, yG Point, w, r2, d2, x *big.Int) 
 	tmpMul.X, tmpMul.Y = Curve.ScalarMult(yG.X, yG.Y, r2.Bytes())
 	b2.X, b2.Y = Curve.Add(tmpMul.X, tmpMul.Y, temp1.X, temp1.Y)
 
-	// Get c = H(i, xG, Y, a1, b1, a2, b2)
+	// Get c = H(i, XG, Y, a1, b1, a2, b2)
 	hash := sha256.New()
 	//hInput := common.GetBigInt(sender, 16).Bytes()
 	hInput := []byte(sender)
