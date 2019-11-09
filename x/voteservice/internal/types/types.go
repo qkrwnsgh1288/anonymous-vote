@@ -13,9 +13,9 @@ type Agenda struct {
 
 	WhiteList     []string `json:"whitelist"`
 	VoteCheckList []string `json:"vote_checklist"` // todo: change to private
+	Progress      string   `json:"progress"`
 
-	Progress string `json:"progress"`
-	//WhiteList map[string]bool  `json:"whitelist"`
+	RegisteredKey []StringPoint `json:"registered_key"`
 }
 
 func NewAgenda() Agenda {

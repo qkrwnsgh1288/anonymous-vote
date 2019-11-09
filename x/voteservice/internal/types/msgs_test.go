@@ -3,7 +3,9 @@ package types
 import (
 	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/crypto"
 	"github.com/stretchr/testify/assert"
+	"math/big"
 	"strings"
 	"testing"
 )
@@ -55,4 +57,35 @@ func TestMarshal(t *testing.T) {
 	var b TestStruct
 	testCdc.MustUnmarshalBinaryBare(encodedData, &b)
 	fmt.Println("b=", b)
+}
+
+type testst struct {
+	Name          *string
+	Value         *int
+	Value2        *big.Int
+	Value3        float64 `amino:"unsafe"`
+	State         crypto.State
+	RegisteredKey []StringPoint `json:"registered_key"`
+}
+
+func TestMarshal2(t *testing.T) {
+	str := "AAA"
+	value := 111
+	//value2 := big.NewInt(222)
+	test := testst{
+		Name:          &str,
+		Value:         &value,
+		Value2:        big.NewInt(222),
+		Value3:        12.12,
+		State:         crypto.SETUP,
+		RegisteredKey: make([]StringPoint, 0),
+	}
+	fmt.Println(*test.Name, *test.Value, test.Value2, test.Value3, test.State, test.RegisteredKey)
+
+	cdc := codec.New()
+	encode := cdc.MustMarshalBinaryBare(test)
+
+	var decode testst
+	cdc.MustUnmarshalBinaryBare(encode, &decode)
+	fmt.Println(*decode.Name, *test.Value, test.Value2, test.Value3, test.State, test.RegisteredKey)
 }

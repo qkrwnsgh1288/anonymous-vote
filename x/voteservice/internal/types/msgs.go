@@ -11,6 +11,15 @@ var (
 	_ sdk.Msg = MsgVoteAgenda{}
 )
 
+type StringPoint struct {
+	X string `json:"x"`
+	Y string `json:"y"`
+}
+
+//func (s StringPoint) String() string {
+//	return fmt.Sprintf("%s, %s", s.X, s.Y)
+//}
+
 // MsgMakeAgenda
 type MsgMakeAgenda struct {
 	AgendaProposer sdk.AccAddress `json:"agenda_proposer"`
@@ -19,18 +28,18 @@ type MsgMakeAgenda struct {
 	AgendaContent string   `json:"agenda_content"`
 	WhiteList     []string `json:"whitelist"`
 	VoteCheckList []string `json:"vote_checklist"`
-	//WhiteList     map[string]bool `json:"whitelist"`
+
+	RegisteredKey []StringPoint `json:"registered_key"`
 }
 
 func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaContent string, whiteList []string) MsgMakeAgenda {
-	/*whiteList := make(map[string]bool)
-	for _, addr := range whiteListSlice {
-		whiteList[addr] = false
-	}*/
 	var voteCheckList []string
 	for i := 0; i < len(whiteList); i++ {
 		voteCheckList = append(voteCheckList, "empty")
 	}
+	//a := make([]StringPoint, 0)
+	//a = append(a, StringPoint{"x1", "y1"})
+	//a = append(a, StringPoint{"x2", "y2"})
 
 	return MsgMakeAgenda{
 		AgendaProposer: agendaProposer,
@@ -38,6 +47,7 @@ func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaC
 		AgendaContent:  agendaContent,
 		WhiteList:      whiteList,
 		VoteCheckList:  voteCheckList,
+		//RegisteredKey:  make([]StringPoint, 0),
 	}
 }
 func (msg MsgMakeAgenda) Route() string { return RouterKey }

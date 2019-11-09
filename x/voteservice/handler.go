@@ -35,6 +35,8 @@ func handleMsgMakeAgenda(ctx sdk.Context, keeper Keeper, msg MsgMakeAgenda) sdk.
 		WhiteList:      msg.WhiteList,
 		VoteCheckList:  msg.VoteCheckList,
 		Progress:       fmt.Sprintf("%d/%d", 0, len(msg.WhiteList)),
+
+		//RegisteredKey: msg.RegisteredKey,
 	}
 
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)

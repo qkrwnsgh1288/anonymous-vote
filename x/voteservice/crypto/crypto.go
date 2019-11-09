@@ -15,6 +15,16 @@ const (
 	Minimum_voter_count = 3
 )
 
+type State int
+
+const (
+	SETUP State = iota
+	SIGNUP
+	COMMITMENT
+	VOTE
+	FINISHED
+)
+
 var (
 	Curve           *secp256k1.BitCurve
 	Voters          []Voter
