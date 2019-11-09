@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/crypto"
 )
 
 const RouterKey = ModuleName // this was defined in your key.go file
@@ -26,10 +27,14 @@ type MsgMakeAgenda struct {
 
 	AgendaTopic   string   `json:"agenda_topic"`
 	AgendaContent string   `json:"agenda_content"`
-	WhiteList     []string `json:"whitelist"`
+	SetupList     []string `json:"setuplist"`
 	VoteCheckList []string `json:"vote_checklist"`
 
-	RegisteredKey []StringPoint `json:"registered_key"`
+	State            crypto.State  `json:"state"`
+	RegisteredKey    []StringPoint `json:"registered_key"`
+	ReconstructedKey []StringPoint `json:"reconstructed_key"`
+	Commitment       string        `json:"commitment"`
+	Vote             []StringPoint `json:"vote"`
 }
 
 func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaContent string, whiteList []string) MsgMakeAgenda {
@@ -43,10 +48,13 @@ func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaC
 
 	return MsgMakeAgenda{
 		AgendaProposer: agendaProposer,
-		AgendaTopic:    agendaTopic,
-		AgendaContent:  agendaContent,
-		WhiteList:      whiteList,
-		VoteCheckList:  voteCheckList,
+
+		AgendaTopic:   agendaTopic,
+		AgendaContent: agendaContent,
+		SetupList:     whiteList,
+		VoteCheckList: voteCheckList,
+
+		State: crypto.SETUP,
 		//RegisteredKey:  make([]StringPoint, 0),
 	}
 }
@@ -60,8 +68,8 @@ func (msg MsgMakeAgenda) ValidateBasic() sdk.Error {
 	if len(msg.AgendaContent) == 0 {
 		return sdk.ErrUnknownRequest("AgendaContent cannot be empty")
 	}
-	if len(msg.WhiteList) == 0 {
-		return sdk.ErrUnknownRequest("WhiteList cannot be empty")
+	if len(msg.SetupList) == 0 {
+		return sdk.ErrUnknownRequest("SetupList cannot be empty")
 	}
 	return nil
 }

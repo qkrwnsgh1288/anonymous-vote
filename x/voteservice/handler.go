@@ -32,10 +32,11 @@ func handleMsgMakeAgenda(ctx sdk.Context, keeper Keeper, msg MsgMakeAgenda) sdk.
 		AgendaProposer: msg.AgendaProposer,
 		AgendaTopic:    msg.AgendaTopic,
 		AgendaContent:  msg.AgendaContent,
-		WhiteList:      msg.WhiteList,
+		SetupList:      msg.SetupList,
 		VoteCheckList:  msg.VoteCheckList,
-		Progress:       fmt.Sprintf("%d/%d", 0, len(msg.WhiteList)),
+		Progress:       fmt.Sprintf("%d/%d", 0, len(msg.SetupList)),
 
+		State: msg.State,
 		//RegisteredKey: msg.RegisteredKey,
 	}
 
@@ -50,7 +51,7 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 	voteCount := 0
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
 
-	for i, val := range agenda.WhiteList {
+	for i, val := range agenda.SetupList {
 		if msg.VoteAddr.String() == val {
 			agenda.VoteCheckList[i] = msg.YesOrNo
 		}
@@ -58,7 +59,7 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 			voteCount += 1
 		}
 	}
-	agenda.Progress = fmt.Sprintf("%d/%d", voteCount, len(agenda.WhiteList))
+	agenda.Progress = fmt.Sprintf("%d/%d", voteCount, len(agenda.SetupList))
 
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
 	return sdk.Result{}
