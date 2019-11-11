@@ -9,19 +9,42 @@ const RouterKey = ModuleName // this was defined in your key.go file
 
 var (
 	_ sdk.Msg = MsgMakeAgenda{}
+	_ sdk.Msg = MsgRegisterByVoter{}
 	_ sdk.Msg = MsgVoteAgenda{}
 )
 
-type StringPoint struct {
+type SPoint struct {
 	X string `json:"x"`
 	Y string `json:"y"`
 }
 
-//func (s StringPoint) String() string {
+func MakeDefaultStringPoint() SPoint {
+	return SPoint{X: "", Y: ""}
+}
+
+type SVoter struct {
+	Addr             string `json:"address"`
+	RegisteredKey    SPoint `json:"registered_key"`
+	ReconstructedKey SPoint `json:"reconstructed_key"`
+	Commitment       string `json:"commitment"`
+	Vote             SPoint `json:"vote"`
+}
+
+func MakeDefaultStringVoter() SVoter {
+	return SVoter{
+		Addr:             "",
+		RegisteredKey:    MakeDefaultStringPoint(),
+		ReconstructedKey: MakeDefaultStringPoint(),
+		Commitment:       "",
+		Vote:             MakeDefaultStringPoint(),
+	}
+}
+
+//func (s SPoint) String() string {
 //	return fmt.Sprintf("%s, %s", s.X, s.Y)
 //}
 
-// MsgMakeAgenda
+// 1. MsgMakeAgenda
 type MsgMakeAgenda struct {
 	AgendaProposer sdk.AccAddress `json:"agenda_proposer"`
 	AgendaTopic    string         `json:"agenda_topic"`
@@ -30,23 +53,17 @@ type MsgMakeAgenda struct {
 	SetupList     []string `json:"setuplist"`
 	VoteCheckList []string `json:"vote_checklist"`
 
-	State            crypto.State  `json:"state"`
-	RegisterList     []string      `json:"registerlist"`
-	RegisteredKey    []StringPoint `json:"registered_key"`
-	ReconstructedKey []StringPoint `json:"reconstructed_key"`
-	Commitment       []string      `json:"commitment"`
-	Vote             []StringPoint `json:"vote"`
+	State crypto.State `json:"state"`
+	Voter []SVoter     `json:"voter"`
 }
 
 func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaContent string, whiteList []string) MsgMakeAgenda {
 	var voteCheckList []string
+	var voterList []SVoter
 	for i := 0; i < len(whiteList); i++ {
 		voteCheckList = append(voteCheckList, "empty")
-
+		voterList = append(voterList, MakeDefaultStringVoter())
 	}
-	//a := make([]StringPoint, 0)
-	//a = append(a, StringPoint{"x1", "y1"})
-	//a = append(a, StringPoint{"x2", "y2"})
 
 	return MsgMakeAgenda{
 		AgendaProposer: agendaProposer,
@@ -57,8 +74,7 @@ func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaC
 		VoteCheckList: voteCheckList,
 
 		State: crypto.SETUP,
-		//RegisterList: make([]string, 0),
-		//RegisteredKey:  make([]StringPoint, 0),
+		Voter: voterList,
 	}
 }
 func (msg MsgMakeAgenda) Route() string { return RouterKey }
@@ -83,7 +99,38 @@ func (msg MsgMakeAgenda) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.AgendaProposer}
 }
 
-// MsgVoteAgenda
+// 2. MsgRegisterByVoter
+type MsgRegisterByVoter struct {
+	AgendaTopic string         `json:"agenda_topic"`
+	VoteAddr    sdk.AccAddress `json:"vote_addr"`
+	ZkInfo      []string       `json:"zk_info"`
+}
+
+func NewMsgRegisterByVoter(voteAddr sdk.AccAddress, topic string, zkInfos []string) MsgRegisterByVoter {
+	return MsgRegisterByVoter{
+		AgendaTopic: topic,
+		VoteAddr:    voteAddr,
+		ZkInfo:      zkInfos,
+	}
+}
+func (msg MsgRegisterByVoter) Route() string { return RouterKey }
+func (msg MsgRegisterByVoter) Type() string  { return "register_by_voter" }
+func (msg MsgRegisterByVoter) ValidateBasic() sdk.Error {
+	// todo: more
+	if len(msg.AgendaTopic) == 0 {
+		return sdk.ErrUnknownRequest("AgendaTopic cannot be empty")
+	}
+
+	return nil
+}
+func (msg MsgRegisterByVoter) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+func (msg MsgRegisterByVoter) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.VoteAddr}
+}
+
+// 3. MsgVoteAgenda
 type MsgVoteAgenda struct {
 	AgendaTopic string         `json:"agenda_topic"`
 	VoteAddr    sdk.AccAddress `json:"vote_addr"`

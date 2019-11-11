@@ -110,7 +110,7 @@ func CreateZKP(senderAddr string, x, v *big.Int, xG Point) (r *big.Int, vG Jacob
 	G.Y = Curve.Gy
 
 	if !Curve.IsOnCurve(xG.X, xG.Y) {
-		return r, vG, errors.New("error occured in CreateZKP: XG is not pubKey")
+		return r, vG, errors.New("error occured in CreateZKP: XG is not pubKey") //types.ErrInvalidPubkeyInCreateZKP(types.DefaultCodespace)
 	}
 
 	// Get g^{v}

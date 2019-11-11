@@ -16,12 +16,8 @@ type Agenda struct {
 	VoteCheckList []string `json:"vote_checklist"` // todo: change to private
 	Progress      string   `json:"progress"`
 
-	State            crypto.State  `json:"state"`
-	RegisterList     []string      `json:"registerlist"`
-	RegisteredKey    []StringPoint `json:"registered_key"`
-	ReconstructedKey []StringPoint `json:"reconstructed_key"`
-	Commitment       []string      `json:"commitment"`
-	Vote             []StringPoint `json:"vote"`
+	State crypto.State `json:"state"`
+	Voter []SVoter     `json:"voter"`
 }
 
 func NewAgenda() Agenda {

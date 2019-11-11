@@ -65,7 +65,7 @@ type testst struct {
 	Value2        *big.Int
 	Value3        float64 `amino:"unsafe"`
 	State         crypto.State
-	RegisteredKey []StringPoint `json:"registered_key"`
+	RegisteredKey []SPoint `json:"registered_key"`
 }
 
 func TestMarshal2(t *testing.T) {
@@ -78,7 +78,7 @@ func TestMarshal2(t *testing.T) {
 		Value2:        big.NewInt(222),
 		Value3:        12.12,
 		State:         crypto.SETUP,
-		RegisteredKey: make([]StringPoint, 0),
+		RegisteredKey: make([]SPoint, 0),
 	}
 	fmt.Println(*test.Name, *test.Value, test.Value2, test.Value3, test.State, test.RegisteredKey)
 
