@@ -18,8 +18,7 @@ const (
 type State int
 
 const (
-	SETUP State = iota + 1
-	SIGNUP
+	SIGNUP State = iota + 1
 	COMMITMENT
 	VOTE
 	FINISHED

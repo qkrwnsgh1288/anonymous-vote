@@ -77,7 +77,7 @@ func TestMarshal2(t *testing.T) {
 		Value:         &value,
 		Value2:        big.NewInt(222),
 		Value3:        12.12,
-		State:         crypto.SETUP,
+		State:         crypto.SIGNUP,
 		RegisteredKey: make([]SPoint, 0),
 	}
 	fmt.Println(*test.Name, *test.Value, test.Value2, test.Value3, test.State, test.RegisteredKey)

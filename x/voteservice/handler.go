@@ -82,8 +82,8 @@ func handleMsgRegisterByVoter(ctx sdk.Context, keeper Keeper, msg MsgRegisterByV
 	}
 
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
-	if agenda.State != crypto.SETUP {
-		return types.ErrStateIsNotSETUP(types.DefaultCodespace).Result()
+	if agenda.State != crypto.SIGNUP {
+		return types.ErrStateIsNotSIGNUP(types.DefaultCodespace).Result()
 	}
 
 	// check whether already registered
@@ -124,8 +124,8 @@ func handleMsgRegisterByProposer(ctx sdk.Context, keeper Keeper, msg MsgRegister
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
 	totalRegistered := agenda.TotalRegistered
 
-	if agenda.State != crypto.SETUP {
-		return types.ErrStateIsNotSETUP(types.DefaultCodespace).Result()
+	if agenda.State != crypto.SIGNUP {
+		return types.ErrStateIsNotSIGNUP(types.DefaultCodespace).Result()
 	}
 	if agenda.AgendaProposer.String() != msg.ProposerAddr.String() {
 		return types.ErrDoNotHavePermission(types.DefaultCodespace).Result()
@@ -185,7 +185,7 @@ func handleMsgRegisterByProposer(ctx sdk.Context, keeper Keeper, msg MsgRegister
 			agenda.Voters[i].ReconstructedKey.Y = yG.Y.String()
 		}
 	}
-	agenda.State = crypto.SIGNUP
+	agenda.State = crypto.COMMITMENT
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
 	return sdk.Result{}
 }

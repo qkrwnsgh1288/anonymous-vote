@@ -74,7 +74,7 @@ func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaC
 		SetupList:     whiteList,
 		VoteCheckList: voteCheckList,
 
-		State: crypto.SETUP,
+		State: crypto.SIGNUP,
 		Voter: voterList,
 	}
 }
