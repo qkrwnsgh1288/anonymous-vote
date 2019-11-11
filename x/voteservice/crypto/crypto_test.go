@@ -380,28 +380,28 @@ func TestComputeTally(t *testing.T) {
 	addr1 := "cosmos152galq9j5764sggk85z504k50xuq788f9ua85f"
 	addr2 := "cosmos1c8mpkaztknquuvfu2lt34939nzgzkg4q799kf3"
 	addr3 := "cosmos1ed3mttdadlc2xwf7ac98ptrt7kg274uswlj900"
-	//addr4 := "cosmos1s0xccm3pf9uq0zpasap5pypav2tp0hnqezaqwm"
-	//addr5 := "cosmos1k07txk9c2yex9m9fwzch2x7hd87qg08kmygd8m"
+	addr4 := "cosmos1s0xccm3pf9uq0zpasap5pypav2tp0hnqezaqwm"
+	addr5 := "cosmos1k07txk9c2yex9m9fwzch2x7hd87qg08kmygd8m"
 
 	v1_r, v1_vG, _ := CreateZKP(addr1, vote1ZK.X, vote1ZK.V, vote1ZK.XG)
 	v2_r, v2_vG, _ := CreateZKP(addr2, vote2ZK.X, vote2ZK.V, vote2ZK.XG)
 	v3_r, v3_vG, _ := CreateZKP(addr3, vote3ZK.X, vote3ZK.V, vote3ZK.XG)
-	//v4_r, v4_vG, _ := CreateZKP(addr4, vote4ZK.X, vote4ZK.V, vote4ZK.XG)
-	//v5_r, v5_vG, _ := CreateZKP(addr5, vote5ZK.X, vote5ZK.V, vote5ZK.XG)
+	v4_r, v4_vG, _ := CreateZKP(addr4, vote4ZK.X, vote4ZK.V, vote4ZK.XG)
+	v5_r, v5_vG, _ := CreateZKP(addr5, vote5ZK.X, vote5ZK.V, vote5ZK.XG)
 
 	assert.True(t, VerifyZKP(addr1, vote1ZK.XG, v1_r, v1_vG))
 	assert.True(t, VerifyZKP(addr2, vote2ZK.XG, v2_r, v2_vG))
 	assert.True(t, VerifyZKP(addr3, vote3ZK.XG, v3_r, v3_vG))
-	//assert.True(t, VerifyZKP(addr4, vote4ZK.XG, v4_r, v4_vG))
-	//assert.True(t, VerifyZKP(addr5, vote5ZK.XG, v5_r, v5_vG))
+	assert.True(t, VerifyZKP(addr4, vote4ZK.XG, v4_r, v4_vG))
+	assert.True(t, VerifyZKP(addr5, vote5ZK.XG, v5_r, v5_vG))
 
 	_ = Register(addr1, vote1ZK.XG, v1_vG, v1_r)
 	_ = Register(addr2, vote2ZK.XG, v2_vG, v2_r)
 	_ = Register(addr3, vote3ZK.XG, v3_vG, v3_r)
-	//_ = Register(addr4, vote4ZK.XG, v4_vG, v4_r)
-	//_ = Register(addr5, vote5ZK.XG, v5_vG, v5_r)
+	_ = Register(addr4, vote4ZK.XG, v4_vG, v4_r)
+	_ = Register(addr5, vote5ZK.XG, v5_vG, v5_r)
 
-	assert.Equal(t, 3, Totalregistered)
+	assert.Equal(t, 5, Totalregistered)
 
 	err := FinishRegistrationPhase()
 	if err != nil {
@@ -426,22 +426,22 @@ func TestComputeTally(t *testing.T) {
 	Voters[2].setCommitment(CommitToVote(addr3, params, vote3ZK.XG, Voters[2].ReconstructedKey, y, a1, b1, a2, b2)) // todo: consider
 	Voters[2].setVote(y)
 
-	//y, a1, b1, a2, b2, params, _ = Create1outof2ZKPNoVote(addr4, vote4ZK.XG, Voters[3].ReconstructedKey, vote4ZK.W, vote4ZK.R, vote4ZK.D, vote4ZK.X)
-	//verifyAddr4 := Verify1outof2ZKP(addr4, params, vote4ZK.XG, Voters[3].ReconstructedKey, y, a1, b1, a2, b2)
-	//assert.True(t, verifyAddr4)
-	//Voters[3].setCommitment(CommitToVote(addr4, params, vote4ZK.XG, Voters[3].ReconstructedKey, y, a1, b1, a2, b2)) // todo: consider
-	//Voters[3].setVote(y)
-	//
-	//y, a1, b1, a2, b2, params, _ = Create1outof2ZKPNoVote(addr5, vote5ZK.XG, Voters[4].ReconstructedKey, vote5ZK.W, vote5ZK.R, vote5ZK.D, vote5ZK.X)
-	//verifyAddr5 := Verify1outof2ZKP(addr5, params, vote5ZK.XG, Voters[4].ReconstructedKey, y, a1, b1, a2, b2)
-	//assert.True(t, verifyAddr5)
-	//Voters[4].setCommitment(CommitToVote(addr5, params, vote5ZK.XG, Voters[4].ReconstructedKey, y, a1, b1, a2, b2)) // todo: consider
-	//Voters[4].setVote(y)
+	y, a1, b1, a2, b2, params, _ = Create1outof2ZKPNoVote(addr4, vote4ZK.XG, Voters[3].ReconstructedKey, vote4ZK.W, vote4ZK.R, vote4ZK.D, vote4ZK.X)
+	verifyAddr4 := Verify1outof2ZKP(addr4, params, vote4ZK.XG, Voters[3].ReconstructedKey, y, a1, b1, a2, b2)
+	assert.True(t, verifyAddr4)
+	Voters[3].setCommitment(CommitToVote(addr4, params, vote4ZK.XG, Voters[3].ReconstructedKey, y, a1, b1, a2, b2)) // todo: consider
+	Voters[3].setVote(y)
 
-	for i, val := range Voters {
-		fmt.Println(i, val.Addr, val.Commitment)
-		fmt.Println(val.Vote.X, val.Vote.Y)
-	}
+	y, a1, b1, a2, b2, params, _ = Create1outof2ZKPNoVote(addr5, vote5ZK.XG, Voters[4].ReconstructedKey, vote5ZK.W, vote5ZK.R, vote5ZK.D, vote5ZK.X)
+	verifyAddr5 := Verify1outof2ZKP(addr5, params, vote5ZK.XG, Voters[4].ReconstructedKey, y, a1, b1, a2, b2)
+	assert.True(t, verifyAddr5)
+	Voters[4].setCommitment(CommitToVote(addr5, params, vote5ZK.XG, Voters[4].ReconstructedKey, y, a1, b1, a2, b2)) // todo: consider
+	Voters[4].setVote(y)
+
+	//for i, val := range Voters {
+	//	fmt.Println(i, val.Addr, val.Commitment)
+	//	fmt.Println(val.Vote.X, val.Vote.Y)
+	//}
 
 	res, err := ComputeTally()
 	assert.Equal(t, 2, res)
