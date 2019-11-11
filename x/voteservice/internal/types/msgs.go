@@ -51,7 +51,7 @@ type MsgMakeAgenda struct {
 	AgendaTopic    string         `json:"agenda_topic"`
 	AgendaContent  string         `json:"agenda_content"`
 
-	SetupList []string     `json:"setuplist"`
+	WhiteList []string     `json:"whitelist"`
 	State     crypto.State `json:"state"`
 	Voters    []SVoter     `json:"voter"`
 }
@@ -67,7 +67,7 @@ func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaC
 		AgendaTopic:    agendaTopic,
 		AgendaContent:  agendaContent,
 
-		SetupList: whiteList,
+		WhiteList: whiteList,
 		State:     crypto.SIGNUP,
 		Voters:    voterList,
 	}
@@ -82,8 +82,8 @@ func (msg MsgMakeAgenda) ValidateBasic() sdk.Error {
 	if len(msg.AgendaContent) == 0 {
 		return sdk.ErrUnknownRequest("AgendaContent cannot be empty")
 	}
-	if len(msg.SetupList) == 0 {
-		return sdk.ErrUnknownRequest("SetupList cannot be empty")
+	if len(msg.WhiteList) == 0 {
+		return sdk.ErrUnknownRequest("WhiteList cannot be empty")
 	}
 	return nil
 }

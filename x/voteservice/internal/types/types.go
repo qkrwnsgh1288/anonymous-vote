@@ -12,7 +12,7 @@ type Agenda struct {
 	AgendaTopic    string         `json:"agenda_topic"`
 	AgendaContent  string         `json:"agenda_content"`
 
-	SetupList       []string `json:"setuplist"`
+	WhiteList       []string `json:"whitelist"`
 	Progress        string   `json:"progress"`
 	TotalRegistered int      `json:"total_registered"`
 
@@ -28,6 +28,6 @@ func (a Agenda) String() string {
 	return strings.TrimSpace(fmt.Sprintf(`AgendaProposer: %s
 AgendaTopic: %s
 AgendaContent: %s
-SetupList: %v
-Progress: %s`, a.AgendaProposer, a.AgendaTopic, a.AgendaContent, a.SetupList, a.Progress))
+WhiteList: %v
+Progress: %s`, a.AgendaProposer, a.AgendaTopic, a.AgendaContent, a.WhiteList, a.Progress))
 }

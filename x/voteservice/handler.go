@@ -40,8 +40,8 @@ func handleMsgMakeAgenda(ctx sdk.Context, keeper Keeper, msg MsgMakeAgenda) sdk.
 		AgendaProposer: msg.AgendaProposer,
 		AgendaTopic:    msg.AgendaTopic,
 		AgendaContent:  msg.AgendaContent,
-		SetupList:      msg.SetupList,
-		Progress:       fmt.Sprintf("%d/%d", 0, len(msg.SetupList)),
+		WhiteList:      msg.WhiteList,
+		Progress:       fmt.Sprintf("%d/%d", 0, len(msg.WhiteList)),
 
 		State:  msg.State,
 		Voters: msg.Voters,
@@ -94,7 +94,7 @@ func handleMsgRegisterByVoter(ctx sdk.Context, keeper Keeper, msg MsgRegisterByV
 
 	// setup list check && save address, registeredKey
 	hasSetupList := false
-	for i, setupAddr := range agenda.SetupList {
+	for i, setupAddr := range agenda.WhiteList {
 		if setupAddr == addr {
 			agenda.Voters[i].Addr = addr
 			agenda.Voters[i].RegisteredKey = types.SPoint{
@@ -198,7 +198,7 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 	voteCount := 0
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
 
-	for _, val := range agenda.SetupList {
+	for _, val := range agenda.WhiteList {
 		if msg.VoteAddr.String() == val {
 			//agenda.VoteCheckList[i] = msg.YesOrNo
 		}
@@ -206,7 +206,7 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 		//	voteCount += 1
 		//}
 	}
-	agenda.Progress = fmt.Sprintf("%d/%d", voteCount, len(agenda.SetupList))
+	agenda.Progress = fmt.Sprintf("%d/%d", voteCount, len(agenda.WhiteList))
 
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
 	return sdk.Result{}
