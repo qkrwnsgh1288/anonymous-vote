@@ -41,11 +41,10 @@ func handleMsgMakeAgenda(ctx sdk.Context, keeper Keeper, msg MsgMakeAgenda) sdk.
 		AgendaTopic:    msg.AgendaTopic,
 		AgendaContent:  msg.AgendaContent,
 		SetupList:      msg.SetupList,
-		VoteCheckList:  msg.VoteCheckList,
 		Progress:       fmt.Sprintf("%d/%d", 0, len(msg.SetupList)),
 
 		State:  msg.State,
-		Voters: msg.Voter,
+		Voters: msg.Voters,
 	}
 
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
@@ -185,12 +184,12 @@ func handleMsgRegisterByProposer(ctx sdk.Context, keeper Keeper, msg MsgRegister
 			agenda.Voters[i].ReconstructedKey.Y = yG.Y.String()
 		}
 	}
-	agenda.State = crypto.COMMITMENT
+	agenda.State = crypto.VOTE
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
 	return sdk.Result{}
 }
 
-//
+// 4. MsgVoteAgenda
 func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.Result {
 	// todo: valid check more
 	if !keeper.IsTopicPresent(ctx, msg.AgendaTopic) {
@@ -199,13 +198,13 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 	voteCount := 0
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
 
-	for i, val := range agenda.SetupList {
+	for _, val := range agenda.SetupList {
 		if msg.VoteAddr.String() == val {
-			agenda.VoteCheckList[i] = msg.YesOrNo
+			//agenda.VoteCheckList[i] = msg.YesOrNo
 		}
-		if agenda.VoteCheckList[i] != "empty" {
-			voteCount += 1
-		}
+		//if agenda.VoteCheckList[i] != "empty" {
+		//	voteCount += 1
+		//}
 	}
 	agenda.Progress = fmt.Sprintf("%d/%d", voteCount, len(agenda.SetupList))
 

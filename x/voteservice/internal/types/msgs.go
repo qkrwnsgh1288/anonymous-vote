@@ -51,18 +51,14 @@ type MsgMakeAgenda struct {
 	AgendaTopic    string         `json:"agenda_topic"`
 	AgendaContent  string         `json:"agenda_content"`
 
-	SetupList     []string `json:"setuplist"`
-	VoteCheckList []string `json:"vote_checklist"`
-
-	State crypto.State `json:"state"`
-	Voter []SVoter     `json:"voter"`
+	SetupList []string     `json:"setuplist"`
+	State     crypto.State `json:"state"`
+	Voters    []SVoter     `json:"voter"`
 }
 
 func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaContent string, whiteList []string) MsgMakeAgenda {
-	var voteCheckList []string
 	var voterList []SVoter
 	for i := 0; i < len(whiteList); i++ {
-		voteCheckList = append(voteCheckList, "empty")
 		voterList = append(voterList, MakeDefaultStringVoter())
 	}
 
@@ -71,11 +67,9 @@ func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaC
 		AgendaTopic:    agendaTopic,
 		AgendaContent:  agendaContent,
 
-		SetupList:     whiteList,
-		VoteCheckList: voteCheckList,
-
-		State: crypto.SIGNUP,
-		Voter: voterList,
+		SetupList: whiteList,
+		State:     crypto.SIGNUP,
+		Voters:    voterList,
 	}
 }
 func (msg MsgMakeAgenda) Route() string { return RouterKey }
@@ -160,7 +154,7 @@ func (msg MsgRegisterByProposer) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.ProposerAddr}
 }
 
-// MsgVoteAgenda
+// 4. MsgVoteAgenda
 type MsgVoteAgenda struct {
 	AgendaTopic string         `json:"agenda_topic"`
 	VoteAddr    sdk.AccAddress `json:"vote_addr"`

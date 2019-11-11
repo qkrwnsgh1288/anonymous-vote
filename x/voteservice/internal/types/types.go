@@ -13,7 +13,6 @@ type Agenda struct {
 	AgendaContent  string         `json:"agenda_content"`
 
 	SetupList       []string `json:"setuplist"`
-	VoteCheckList   []string `json:"vote_checklist"` // todo: change to private
 	Progress        string   `json:"progress"`
 	TotalRegistered int      `json:"total_registered"`
 
@@ -30,6 +29,5 @@ func (a Agenda) String() string {
 AgendaTopic: %s
 AgendaContent: %s
 SetupList: %v
-VoteCheckList: %v
-Progress: %s`, a.AgendaProposer, a.AgendaTopic, a.AgendaContent, a.SetupList, a.VoteCheckList, a.Progress))
+Progress: %s`, a.AgendaProposer, a.AgendaTopic, a.AgendaContent, a.SetupList, a.Progress))
 }

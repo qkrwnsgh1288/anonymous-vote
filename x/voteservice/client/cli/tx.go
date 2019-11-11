@@ -99,6 +99,8 @@ func GetCmdRegisterByProposer(cdc *codec.Codec) *cobra.Command {
 	}
 	return c
 }
+
+// 4. MsgVoteAgenda
 func GetCmdVoteAgenda(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "vote-agenda [topic] [yes or no]",
