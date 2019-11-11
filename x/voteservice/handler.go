@@ -196,8 +196,8 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 	if !keeper.IsTopicPresent(ctx, msg.AgendaTopic) {
 		return types.ErrAgendaTopicDoesNotExist(types.DefaultCodespace).Result()
 	}
-	voteCount := 0
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
+	voteCount := 0
 
 	zkInfo := crypto.ZkInfo{
 		X: common.GetBigInt(msg.ZkInfo[0], 10),
@@ -212,9 +212,7 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 		if voter.Addr == addr {
 			xG := types.GetPointFromSPoint(voter.RegisteredKey, 10)
 			yG := types.GetPointFromSPoint(voter.ReconstructedKey, 10)
-			if voter.Vote.X == "" || voter.Vote.Y == "" {
-				voteCount += 1
-			}
+
 			switch msg.YesOrNo {
 			case "yes":
 				y, a1, b1, a2, b2, params, _ := crypto.Create1outof2ZKPYesVote(addr, xG, yG, zkInfo.W, zkInfo.R, zkInfo.D, zkInfo.X)
@@ -234,6 +232,9 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 			default:
 				return types.ErrInvalidAnswer(types.DefaultCodespace).Result()
 			}
+		}
+		if voter.Vote.X != "" || voter.Vote.Y != "" {
+			voteCount += 1
 		}
 	}
 	agenda.Progress = fmt.Sprintf("%d/%d", voteCount, agenda.TotalRegistered)
