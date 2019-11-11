@@ -42,10 +42,8 @@ func handleMsgMakeAgenda(ctx sdk.Context, keeper Keeper, msg MsgMakeAgenda) sdk.
 		AgendaContent:  msg.AgendaContent,
 
 		WhiteList: msg.WhiteList,
-		Progress:  fmt.Sprintf("%d/%d", 0, len(msg.WhiteList)),
-
-		State:  msg.State,
-		Voters: msg.Voters,
+		State:     msg.State,
+		Voters:    msg.Voters,
 	}
 
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
@@ -197,7 +195,10 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 		return types.ErrAgendaTopicDoesNotExist(types.DefaultCodespace).Result()
 	}
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
-	voteCount := 0
+
+	if agenda.State != crypto.VOTE {
+		return types.ErrStateIsNotVOTE(types.DefaultCodespace).Result()
+	}
 
 	zkInfo := crypto.ZkInfo{
 		X: common.GetBigInt(msg.ZkInfo[0], 10),
@@ -212,12 +213,16 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 		if voter.Addr == addr {
 			xG := types.GetPointFromSPoint(voter.RegisteredKey, 10)
 			yG := types.GetPointFromSPoint(voter.ReconstructedKey, 10)
+			isFirst := false
 
 			switch msg.YesOrNo {
 			case "yes":
 				y, a1, b1, a2, b2, params, _ := crypto.Create1outof2ZKPYesVote(addr, xG, yG, zkInfo.W, zkInfo.R, zkInfo.D, zkInfo.X)
 				if !crypto.Verify1outof2ZKP(addr, params, xG, yG, y, a1, b1, a2, b2) {
 					return types.ErrInvalidVerify1outof2ZKP(types.DefaultCodespace).Result()
+				}
+				if voter.Vote.X == "" && voter.Vote.Y == "" {
+					isFirst = true
 				}
 				agenda.Voters[i].Commitment = crypto.CommitToVote(addr, params, xG, yG, y, a1, b1, a2, b2)
 				agenda.Voters[i].Vote = types.GetSPointFromPoint(y)
@@ -226,18 +231,20 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 				if !crypto.Verify1outof2ZKP(addr, params, xG, yG, y, a1, b1, a2, b2) {
 					return types.ErrInvalidVerify1outof2ZKP(types.DefaultCodespace).Result()
 				}
+				if voter.Vote.X == "" && voter.Vote.Y == "" {
+					isFirst = true
+				}
 				agenda.Voters[i].Commitment = crypto.CommitToVote(addr, params, xG, yG, y, a1, b1, a2, b2)
 				agenda.Voters[i].Vote = types.GetSPointFromPoint(y)
-				fmt.Println(agenda.Voters[i])
 			default:
 				return types.ErrInvalidAnswer(types.DefaultCodespace).Result()
 			}
-		}
-		if voter.Vote.X != "" || voter.Vote.Y != "" {
-			voteCount += 1
+			if isFirst {
+				agenda.TotalVoteComplete += 1
+			}
+			break
 		}
 	}
-	agenda.Progress = fmt.Sprintf("%d/%d", voteCount, agenda.TotalRegistered)
 
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
 	return sdk.Result{}
