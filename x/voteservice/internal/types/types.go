@@ -12,9 +12,10 @@ type Agenda struct {
 	AgendaTopic    string         `json:"agenda_topic"`
 	AgendaContent  string         `json:"agenda_content"`
 
-	SetupList     []string `json:"setuplist"`
-	VoteCheckList []string `json:"vote_checklist"` // todo: change to private
-	Progress      string   `json:"progress"`
+	SetupList       []string `json:"setuplist"`
+	VoteCheckList   []string `json:"vote_checklist"` // todo: change to private
+	Progress        string   `json:"progress"`
+	TotalRegistered int      `json:"total_registered"`
 
 	State crypto.State `json:"state"`
 	Voter []SVoter     `json:"voter"`

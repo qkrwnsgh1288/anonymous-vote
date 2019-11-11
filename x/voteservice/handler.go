@@ -79,6 +79,16 @@ func handleMsgRegisterByVoter(ctx sdk.Context, keeper Keeper, msg MsgRegisterByV
 	}
 
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
+	if agenda.State != crypto.SETUP {
+		return types.ErrStateIsNotSETUP(types.DefaultCodespace).Result()
+	}
+
+	// check whether already registered
+	for _, voter := range agenda.Voter {
+		if voter.Addr == addr {
+			return types.ErrAlreadyRegisterd(types.DefaultCodespace).Result()
+		}
+	}
 
 	// setup list check && save address, registeredKey
 	hasSetupList := false
@@ -90,14 +100,14 @@ func handleMsgRegisterByVoter(ctx sdk.Context, keeper Keeper, msg MsgRegisterByV
 				Y: zkInfo.XG.Y.String(),
 			}
 			hasSetupList = true
+			agenda.TotalRegistered += 1
+			break
 		}
 	}
 	if !hasSetupList {
 		return types.ErrDoesNotRegisterAddress(types.DefaultCodespace).Result()
 	}
-
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
-
 	return sdk.Result{}
 }
 func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.Result {
