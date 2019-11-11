@@ -40,8 +40,9 @@ func handleMsgMakeAgenda(ctx sdk.Context, keeper Keeper, msg MsgMakeAgenda) sdk.
 		AgendaProposer: msg.AgendaProposer,
 		AgendaTopic:    msg.AgendaTopic,
 		AgendaContent:  msg.AgendaContent,
-		WhiteList:      msg.WhiteList,
-		Progress:       fmt.Sprintf("%d/%d", 0, len(msg.WhiteList)),
+
+		WhiteList: msg.WhiteList,
+		Progress:  fmt.Sprintf("%d/%d", 0, len(msg.WhiteList)),
 
 		State:  msg.State,
 		Voters: msg.Voters,
@@ -51,7 +52,7 @@ func handleMsgMakeAgenda(ctx sdk.Context, keeper Keeper, msg MsgMakeAgenda) sdk.
 	return sdk.Result{}
 }
 
-// 2. MsgRegisterByVoter
+// 2. MsgRegisterByVoter (Addr, RegisteredKey setting)
 func handleMsgRegisterByVoter(ctx sdk.Context, keeper Keeper, msg MsgRegisterByVoter) sdk.Result {
 	// todo: valid check more
 	if !keeper.IsTopicPresent(ctx, msg.AgendaTopic) {
@@ -198,15 +199,44 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 	voteCount := 0
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
 
-	for _, val := range agenda.WhiteList {
-		if msg.VoteAddr.String() == val {
-			//agenda.VoteCheckList[i] = msg.YesOrNo
-		}
-		//if agenda.VoteCheckList[i] != "empty" {
-		//	voteCount += 1
-		//}
+	zkInfo := crypto.ZkInfo{
+		X: common.GetBigInt(msg.ZkInfo[0], 10),
+		V: common.GetBigInt(msg.ZkInfo[3], 10),
+		W: common.GetBigInt(msg.ZkInfo[4], 10),
+		R: common.GetBigInt(msg.ZkInfo[5], 10),
+		D: common.GetBigInt(msg.ZkInfo[6], 10),
 	}
-	agenda.Progress = fmt.Sprintf("%d/%d", voteCount, len(agenda.WhiteList))
+	addr := msg.VoteAddr.String()
+
+	for i, voter := range agenda.Voters {
+		if voter.Addr == addr {
+			xG := types.GetPointFromSPoint(voter.RegisteredKey, 10)
+			yG := types.GetPointFromSPoint(voter.ReconstructedKey, 10)
+			if voter.Vote.X == "" || voter.Vote.Y == "" {
+				voteCount += 1
+			}
+			switch msg.YesOrNo {
+			case "yes":
+				y, a1, b1, a2, b2, params, _ := crypto.Create1outof2ZKPYesVote(addr, xG, yG, zkInfo.W, zkInfo.R, zkInfo.D, zkInfo.X)
+				if !crypto.Verify1outof2ZKP(addr, params, xG, yG, y, a1, b1, a2, b2) {
+					return types.ErrInvalidVerify1outof2ZKP(types.DefaultCodespace).Result()
+				}
+				agenda.Voters[i].Commitment = crypto.CommitToVote(addr, params, xG, yG, y, a1, b1, a2, b2)
+				agenda.Voters[i].Vote = types.GetSPointFromPoint(y)
+			case "no":
+				y, a1, b1, a2, b2, params, _ := crypto.Create1outof2ZKPNoVote(addr, xG, yG, zkInfo.W, zkInfo.R, zkInfo.D, zkInfo.X)
+				if !crypto.Verify1outof2ZKP(addr, params, xG, yG, y, a1, b1, a2, b2) {
+					return types.ErrInvalidVerify1outof2ZKP(types.DefaultCodespace).Result()
+				}
+				agenda.Voters[i].Commitment = crypto.CommitToVote(addr, params, xG, yG, y, a1, b1, a2, b2)
+				agenda.Voters[i].Vote = types.GetSPointFromPoint(y)
+				fmt.Println(agenda.Voters[i])
+			default:
+				return types.ErrInvalidAnswer(types.DefaultCodespace).Result()
+			}
+		}
+	}
+	agenda.Progress = fmt.Sprintf("%d/%d", voteCount, agenda.TotalRegistered)
 
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
 	return sdk.Result{}

@@ -52,6 +52,7 @@ type voteAgendaReq struct {
 	BaseReq     rest.BaseReq `json:"base_req"`
 	AgendaTopic string       `json:"agenda_topic"`
 	VoteAddr    string       `json:"vote_addr"`
+	ZkInfo      []string     `json:"zk_info"`
 	YesOrNo     string       `json:"yes_or_no"`
 }
 
@@ -77,7 +78,7 @@ func voteAgendaHandler(cliCtx context.CLIContext) http.HandlerFunc {
 
 		answer := strings.TrimSpace(strings.ToLower(req.YesOrNo))
 
-		msg := types.NewMsgVoteAgenda(addr, req.AgendaTopic, answer)
+		msg := types.NewMsgVoteAgenda(addr, req.AgendaTopic, answer, req.ZkInfo)
 		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

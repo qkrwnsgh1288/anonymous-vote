@@ -77,13 +77,13 @@ func (msg MsgMakeAgenda) Type() string  { return "make_agenda" }
 func (msg MsgMakeAgenda) ValidateBasic() sdk.Error {
 	// todo: more
 	if len(msg.AgendaTopic) == 0 {
-		return sdk.ErrUnknownRequest("AgendaTopic cannot be empty")
+		return ErrAgendaTopicIsEmpty(DefaultCodespace)
 	}
 	if len(msg.AgendaContent) == 0 {
-		return sdk.ErrUnknownRequest("AgendaContent cannot be empty")
+		return ErrAgendaContentIsEmpty(DefaultCodespace)
 	}
 	if len(msg.WhiteList) == 0 {
-		return sdk.ErrUnknownRequest("WhiteList cannot be empty")
+		return ErrWhiteListIsEmpty(DefaultCodespace)
 	}
 	return nil
 }
@@ -113,7 +113,7 @@ func (msg MsgRegisterByVoter) Type() string  { return "register_by_voter" }
 func (msg MsgRegisterByVoter) ValidateBasic() sdk.Error {
 	// todo: more
 	if len(msg.AgendaTopic) == 0 {
-		return sdk.ErrUnknownRequest("AgendaTopic cannot be empty")
+		return ErrAgendaTopicIsEmpty(DefaultCodespace)
 	}
 
 	return nil
@@ -142,7 +142,7 @@ func (msg MsgRegisterByProposer) Type() string  { return "register_by_proposer" 
 func (msg MsgRegisterByProposer) ValidateBasic() sdk.Error {
 	// todo: more
 	if len(msg.AgendaTopic) == 0 {
-		return sdk.ErrUnknownRequest("AgendaTopic cannot be empty")
+		return ErrAgendaTopicIsEmpty(DefaultCodespace)
 	}
 
 	return nil
@@ -158,13 +158,15 @@ func (msg MsgRegisterByProposer) GetSigners() []sdk.AccAddress {
 type MsgVoteAgenda struct {
 	AgendaTopic string         `json:"agenda_topic"`
 	VoteAddr    sdk.AccAddress `json:"vote_addr"`
+	ZkInfo      []string       `json:"zk_info"`
 	YesOrNo     string         `json:"yes_or_no"`
 }
 
-func NewMsgVoteAgenda(voteAddr sdk.AccAddress, topic string, yesOrNo string) MsgVoteAgenda {
+func NewMsgVoteAgenda(voteAddr sdk.AccAddress, topic string, yesOrNo string, zkInfos []string) MsgVoteAgenda {
 	return MsgVoteAgenda{
 		AgendaTopic: topic,
 		VoteAddr:    voteAddr,
+		ZkInfo:      zkInfos,
 		YesOrNo:     yesOrNo,
 	}
 }
@@ -173,11 +175,11 @@ func (msg MsgVoteAgenda) Type() string  { return "vote_agenda" }
 func (msg MsgVoteAgenda) ValidateBasic() sdk.Error {
 	// todo: more
 	if len(msg.AgendaTopic) == 0 {
-		return sdk.ErrUnknownRequest("AgendaTopic cannot be empty")
+		return ErrAgendaTopicIsEmpty(DefaultCodespace)
 	}
 
 	if !(msg.YesOrNo == "yes" || msg.YesOrNo == "no") {
-		return sdk.ErrUnknownRequest("Answer should be yes or no")
+		return ErrInvalidAnswer(DefaultCodespace)
 	}
 
 	return nil

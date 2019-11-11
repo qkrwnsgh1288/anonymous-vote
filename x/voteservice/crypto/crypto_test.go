@@ -407,11 +407,6 @@ func TestComputeTally(t *testing.T) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	for i, val := range Voters {
-		fmt.Println(i, val.Addr)
-		fmt.Println(val.RegisteredKey.X, val.RegisteredKey.Y)
-		fmt.Println(val.ReconstructedKey.X, val.ReconstructedKey.Y)
-	}
 
 	y, a1, b1, a2, b2, params, _ := Create1outof2ZKPYesVote(addr1, vote1ZK.XG, Voters[0].ReconstructedKey, vote1ZK.W, vote1ZK.R, vote1ZK.D, vote1ZK.X)
 	verifyAddr1 := Verify1outof2ZKP(addr1, params, vote1ZK.XG, Voters[0].ReconstructedKey, y, a1, b1, a2, b2)
@@ -442,6 +437,11 @@ func TestComputeTally(t *testing.T) {
 	//assert.True(t, verifyAddr5)
 	//Voters[4].setCommitment(CommitToVote(addr5, params, vote5ZK.XG, Voters[4].ReconstructedKey, y, a1, b1, a2, b2)) // todo: consider
 	//Voters[4].setVote(y)
+
+	for i, val := range Voters {
+		fmt.Println(i, val.Addr, val.Commitment)
+		fmt.Println(val.Vote.X, val.Vote.Y)
+	}
 
 	res, err := ComputeTally()
 	assert.Equal(t, 2, res)

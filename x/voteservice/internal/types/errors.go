@@ -9,9 +9,12 @@ const (
 
 	// basic (100 ~ 200)
 	CodeNameDoesNotExist    sdk.CodeType = 101
-	AgendaTopicAlreadyExist sdk.CodeType = 102
-	AgendaTopicDoesNotExist sdk.CodeType = 103
-	InvalidAnswer           sdk.CodeType = 104
+	InvalidAnswer           sdk.CodeType = 102
+	AgendaTopicAlreadyExist sdk.CodeType = 103
+	AgendaTopicDoesNotExist sdk.CodeType = 104
+	AgendaTopicIsEmpty      sdk.CodeType = 105
+	AgendaContentIsEmpty    sdk.CodeType = 106
+	WhiteListIsEmpty        sdk.CodeType = 107
 
 	// about zk (201 ~ 299)
 	InvalidPubkeyInCreateZKP  sdk.CodeType = 201
@@ -20,17 +23,21 @@ const (
 	AlreadyRegisterd          sdk.CodeType = 204
 	InvalidTotalRegisteredCnt sdk.CodeType = 205
 	DoNotHavePermission       sdk.CodeType = 206
+	InvalidVerify1outof2ZKP   sdk.CodeType = 207
 
-	StateIsNotSETUP      sdk.CodeType = 211
-	StateIsNotSIGNUP     sdk.CodeType = 212
-	StateIsNotCOMMITMENT sdk.CodeType = 213
-	StateIsNotVOTE       sdk.CodeType = 214
-	StateIsNotFINISHED   sdk.CodeType = 215
+	StateIsNotSETUP      sdk.CodeType = 291
+	StateIsNotSIGNUP     sdk.CodeType = 292
+	StateIsNotCOMMITMENT sdk.CodeType = 293
+	StateIsNotVOTE       sdk.CodeType = 294
+	StateIsNotFINISHED   sdk.CodeType = 295
 )
 
 // basic (100 ~ 200)
 func ErrNameDoesNotExist(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeNameDoesNotExist, "Name does not exist")
+}
+func ErrInvalidAnswer(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, InvalidAnswer, "Answer is not valid. It should be yes or no")
 }
 func ErrAgendaTopicAlreadyExist(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, AgendaTopicAlreadyExist, "AgendaTopic already exist")
@@ -38,8 +45,14 @@ func ErrAgendaTopicAlreadyExist(codespace sdk.CodespaceType) sdk.Error {
 func ErrAgendaTopicDoesNotExist(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, AgendaTopicDoesNotExist, "AgendaTopic does not exist")
 }
-func ErrInvalidAnswer(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, InvalidAnswer, "Answer is not valid. It should be yes or no")
+func ErrAgendaTopicIsEmpty(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, AgendaTopicIsEmpty, "AgendaTopic cannot be empty")
+}
+func ErrAgendaContentIsEmpty(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, AgendaContentIsEmpty, "AgendaContent cannot be empty")
+}
+func ErrWhiteListIsEmpty(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, WhiteListIsEmpty, "WhiteList cannot be empty")
 }
 
 // about zk (201 ~ 299)
@@ -60,6 +73,9 @@ func ErrInvalidTotalRegisteredCnt(codespace sdk.CodespaceType) sdk.Error {
 }
 func ErrDoNotHavePermission(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, DoNotHavePermission, "You don't have permission. It is only possible for the owner")
+}
+func ErrInvalidVerify1outof2ZKP(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, InvalidVerify1outof2ZKP, "It is Invalid verify 1 outof 2 ZKP")
 }
 
 func ErrStateIsNotSETUP(codespace sdk.CodespaceType) sdk.Error {

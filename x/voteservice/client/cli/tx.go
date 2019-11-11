@@ -103,16 +103,20 @@ func GetCmdRegisterByProposer(cdc *codec.Codec) *cobra.Command {
 // 4. MsgVoteAgenda
 func GetCmdVoteAgenda(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "vote-agenda [topic] [yes or no]",
+		Use:   "vote-agenda [topic] [yes or no] [file_path]",
 		Short: "vote agenda about topic",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
+			zkSlice, err := common.ReadZkInfoFromFile(args[2])
+			if err != nil {
+				return err
+			}
 			answer := strings.TrimSpace(strings.ToLower(args[1]))
 
-			msg := types.NewMsgVoteAgenda(cliCtx.GetFromAddress(), args[0], answer)
+			msg := types.NewMsgVoteAgenda(cliCtx.GetFromAddress(), args[0], answer, zkSlice)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
