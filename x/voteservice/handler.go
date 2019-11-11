@@ -45,7 +45,7 @@ func handleMsgMakeAgenda(ctx sdk.Context, keeper Keeper, msg MsgMakeAgenda) sdk.
 
 		WhiteList: msg.WhiteList,
 		State:     crypto.SIGNUP,
-		Voters:    msg.Voters,
+		//Voters:    msg.Voters,
 	}
 
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
@@ -97,15 +97,18 @@ func handleMsgRegisterByVoter(ctx sdk.Context, keeper Keeper, msg MsgRegisterByV
 
 	// setup list check && save address, registeredKey
 	hasSetupList := false
-	for i, setupAddr := range agenda.WhiteList {
+	for _, setupAddr := range agenda.WhiteList {
 		if setupAddr == addr {
-			agenda.Voters[i].Addr = addr
-			agenda.Voters[i].RegisteredKey = types.SPoint{
+			tmpVoter := types.MakeDefaultSVoter()
+			tmpVoter.Addr = addr
+			tmpVoter.RegisteredKey = types.SPoint{
 				X: zkInfo.XG.X.String(),
 				Y: zkInfo.XG.Y.String(),
 			}
-			hasSetupList = true
+			agenda.Voters = append(agenda.Voters, tmpVoter)
 			agenda.TotalRegistered += 1
+
+			hasSetupList = true
 			break
 		}
 	}

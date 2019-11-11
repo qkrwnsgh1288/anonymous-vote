@@ -32,3 +32,30 @@ AgendaTopic: %s
 AgendaContent: %s
 WhiteList: %v`, a.AgendaProposer, a.AgendaTopic, a.AgendaContent, a.WhiteList))
 }
+
+type SPoint struct {
+	X string `json:"x"`
+	Y string `json:"y"`
+}
+
+func MakeDefaultSPoint() SPoint {
+	return SPoint{X: "", Y: ""}
+}
+
+type SVoter struct {
+	Addr             string `json:"address"`
+	RegisteredKey    SPoint `json:"registered_key"`
+	ReconstructedKey SPoint `json:"reconstructed_key"`
+	Commitment       string `json:"commitment"`
+	Vote             SPoint `json:"vote"`
+}
+
+func MakeDefaultSVoter() SVoter {
+	return SVoter{
+		Addr:             "",
+		RegisteredKey:    MakeDefaultSPoint(),
+		ReconstructedKey: MakeDefaultSPoint(),
+		Commitment:       "",
+		Vote:             MakeDefaultSPoint(),
+	}
+}

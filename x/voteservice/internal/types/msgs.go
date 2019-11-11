@@ -14,37 +14,6 @@ var (
 	_ sdk.Msg = MsgTally{}
 )
 
-type SPoint struct {
-	X string `json:"x"`
-	Y string `json:"y"`
-}
-
-func MakeDefaultStringPoint() SPoint {
-	return SPoint{X: "", Y: ""}
-}
-
-type SVoter struct {
-	Addr             string `json:"address"`
-	RegisteredKey    SPoint `json:"registered_key"`
-	ReconstructedKey SPoint `json:"reconstructed_key"`
-	Commitment       string `json:"commitment"`
-	Vote             SPoint `json:"vote"`
-}
-
-func MakeDefaultStringVoter() SVoter {
-	return SVoter{
-		Addr:             "",
-		RegisteredKey:    MakeDefaultStringPoint(),
-		ReconstructedKey: MakeDefaultStringPoint(),
-		Commitment:       "",
-		Vote:             MakeDefaultStringPoint(),
-	}
-}
-
-//func (s SPoint) String() string {
-//	return fmt.Sprintf("%s, %s", s.X, s.Y)
-//}
-
 // 1. MsgMakeAgenda
 type MsgMakeAgenda struct {
 	AgendaProposer sdk.AccAddress `json:"agenda_proposer"`
@@ -58,7 +27,7 @@ type MsgMakeAgenda struct {
 func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaContent string, whiteList []string) MsgMakeAgenda {
 	var voterList []SVoter
 	for i := 0; i < len(whiteList); i++ {
-		voterList = append(voterList, MakeDefaultStringVoter())
+		voterList = append(voterList, MakeDefaultSVoter())
 	}
 
 	return MsgMakeAgenda{
@@ -67,7 +36,7 @@ func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaC
 		AgendaContent:  agendaContent,
 
 		WhiteList: whiteList,
-		Voters:    voterList,
+		//Voters:    voterList,
 	}
 }
 func (msg MsgMakeAgenda) Route() string { return RouterKey }
