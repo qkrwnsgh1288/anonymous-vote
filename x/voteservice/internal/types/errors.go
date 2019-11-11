@@ -8,6 +8,7 @@ const (
 	DefaultCodespace sdk.CodespaceType = ModuleName
 
 	// basic (100 ~ 200)
+	SomethingIsBad          sdk.CodeType = 100
 	CodeNameDoesNotExist    sdk.CodeType = 101
 	InvalidAnswer           sdk.CodeType = 102
 	AgendaTopicAlreadyExist sdk.CodeType = 103
@@ -24,6 +25,7 @@ const (
 	InvalidTotalRegisteredCnt sdk.CodeType = 205
 	DoNotHavePermission       sdk.CodeType = 206
 	InvalidVerify1outof2ZKP   sdk.CodeType = 207
+	VotingIsNotFinished       sdk.CodeType = 208
 
 	StateIsNotSETUP      sdk.CodeType = 291
 	StateIsNotSIGNUP     sdk.CodeType = 292
@@ -33,6 +35,9 @@ const (
 )
 
 // basic (100 ~ 200)
+func ErrSomethingIsBad(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, SomethingIsBad, "something bad happened")
+}
 func ErrNameDoesNotExist(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeNameDoesNotExist, "Name does not exist")
 }
@@ -76,6 +81,9 @@ func ErrDoNotHavePermission(codespace sdk.CodespaceType) sdk.Error {
 }
 func ErrInvalidVerify1outof2ZKP(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, InvalidVerify1outof2ZKP, "It is Invalid verify 1 outof 2 ZKP")
+}
+func ErrVotingIsNotFinished(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, VotingIsNotFinished, "Voting is not finished")
 }
 
 func ErrStateIsNotSETUP(codespace sdk.CodespaceType) sdk.Error {

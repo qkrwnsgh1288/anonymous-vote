@@ -27,6 +27,7 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		GetCmdRegisterByVoter(cdc),
 		GetCmdRegisterByProposer(cdc),
 		GetCmdVoteAgenda(cdc),
+		GetCmdTally(cdc),
 	)...)
 
 	return nameserviceTxCmd
@@ -123,4 +124,24 @@ func GetCmdVoteAgenda(cdc *codec.Codec) *cobra.Command {
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
+}
+
+// 5. MsgTally
+func GetCmdTally(cdc *codec.Codec) *cobra.Command {
+	c := &cobra.Command{
+		Use:   "tally [topic]",
+		Short: "tally",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			msg := types.NewMsgTally(cliCtx.GetFromAddress(), args[0])
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+	return c
 }

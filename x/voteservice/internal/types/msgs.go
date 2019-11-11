@@ -2,7 +2,6 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/crypto"
 )
 
 const RouterKey = ModuleName // this was defined in your key.go file
@@ -12,6 +11,7 @@ var (
 	_ sdk.Msg = MsgRegisterByVoter{}
 	_ sdk.Msg = MsgRegisterByProposer{}
 	_ sdk.Msg = MsgVoteAgenda{}
+	_ sdk.Msg = MsgTally{}
 )
 
 type SPoint struct {
@@ -51,9 +51,8 @@ type MsgMakeAgenda struct {
 	AgendaTopic    string         `json:"agenda_topic"`
 	AgendaContent  string         `json:"agenda_content"`
 
-	WhiteList []string     `json:"whitelist"`
-	State     crypto.State `json:"state"`
-	Voters    []SVoter     `json:"voter"`
+	WhiteList []string `json:"whitelist"`
+	Voters    []SVoter `json:"voter"`
 }
 
 func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaContent string, whiteList []string) MsgMakeAgenda {
@@ -68,7 +67,6 @@ func NewMsgMakeAgenda(agendaProposer sdk.AccAddress, agendaTopic string, agendaC
 		AgendaContent:  agendaContent,
 
 		WhiteList: whiteList,
-		State:     crypto.SIGNUP,
 		Voters:    voterList,
 	}
 }
@@ -189,4 +187,33 @@ func (msg MsgVoteAgenda) GetSignBytes() []byte {
 }
 func (msg MsgVoteAgenda) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.VoteAddr}
+}
+
+// 5. MsgTally
+type MsgTally struct {
+	AgendaTopic  string         `json:"agenda_topic"`
+	ProposerAddr sdk.AccAddress `json:"proposer_addr"`
+}
+
+func NewMsgTally(proposerAddr sdk.AccAddress, topic string) MsgTally {
+	return MsgTally{
+		AgendaTopic:  topic,
+		ProposerAddr: proposerAddr,
+	}
+}
+func (msg MsgTally) Route() string { return RouterKey }
+func (msg MsgTally) Type() string  { return "tally" }
+func (msg MsgTally) ValidateBasic() sdk.Error {
+	// todo: more
+	if len(msg.AgendaTopic) == 0 {
+		return ErrAgendaTopicIsEmpty(DefaultCodespace)
+	}
+
+	return nil
+}
+func (msg MsgTally) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+func (msg MsgTally) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.ProposerAddr}
 }

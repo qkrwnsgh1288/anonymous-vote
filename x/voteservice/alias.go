@@ -29,5 +29,6 @@ type (
 	MsgRegisterByVoter    = types.MsgRegisterByVoter
 	MsgRegisterByProposer = types.MsgRegisterByProposer
 	MsgVoteAgenda         = types.MsgVoteAgenda
+	MsgTally              = types.MsgTally
 	Agenda                = types.Agenda
 )

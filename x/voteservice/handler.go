@@ -22,6 +22,8 @@ func NewHandler(keeper Keeper) sdk.Handler {
 			return handleMsgRegisterByProposer(ctx, keeper, msg)
 		case MsgVoteAgenda:
 			return handleMsgVoteAgenda(ctx, keeper, msg)
+		case MsgTally:
+			return handleMsgTally(ctx, keeper, msg)
 		default:
 			errMsg := fmt.Sprintf("Unrecognized voteservice Msg type: %v", msg.Type())
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -42,7 +44,7 @@ func handleMsgMakeAgenda(ctx sdk.Context, keeper Keeper, msg MsgMakeAgenda) sdk.
 		AgendaContent:  msg.AgendaContent,
 
 		WhiteList: msg.WhiteList,
-		State:     msg.State,
+		State:     crypto.SIGNUP,
 		Voters:    msg.Voters,
 	}
 
@@ -80,6 +82,8 @@ func handleMsgRegisterByVoter(ctx sdk.Context, keeper Keeper, msg MsgRegisterByV
 	}
 
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
+
+	// check state
 	if agenda.State != crypto.SIGNUP {
 		return types.ErrStateIsNotSIGNUP(types.DefaultCodespace).Result()
 	}
@@ -122,9 +126,11 @@ func handleMsgRegisterByProposer(ctx sdk.Context, keeper Keeper, msg MsgRegister
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
 	totalRegistered := agenda.TotalRegistered
 
+	// check state
 	if agenda.State != crypto.SIGNUP {
 		return types.ErrStateIsNotSIGNUP(types.DefaultCodespace).Result()
 	}
+	// It is only possible by proposer
 	if agenda.AgendaProposer.String() != msg.ProposerAddr.String() {
 		return types.ErrDoNotHavePermission(types.DefaultCodespace).Result()
 	}
@@ -196,6 +202,7 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 	}
 	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
 
+	// check state
 	if agenda.State != crypto.VOTE {
 		return types.ErrStateIsNotVOTE(types.DefaultCodespace).Result()
 	}
@@ -248,4 +255,82 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 
 	keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
 	return sdk.Result{}
+}
+
+// 5. MsgTally
+func handleMsgTally(ctx sdk.Context, keeper Keeper, msg types.MsgTally) sdk.Result {
+	// todo: valid check more
+	if !keeper.IsTopicPresent(ctx, msg.AgendaTopic) {
+		return types.ErrAgendaTopicDoesNotExist(types.DefaultCodespace).Result()
+	}
+	agenda := keeper.GetAgenda(ctx, msg.AgendaTopic)
+	totalRegistered := agenda.TotalRegistered
+
+	// check state
+	if agenda.State != crypto.VOTE {
+		return types.ErrStateIsNotVOTE(types.DefaultCodespace).Result()
+	}
+	// It is only possible by proposer
+	if agenda.AgendaProposer.String() != msg.ProposerAddr.String() {
+		return types.ErrDoNotHavePermission(types.DefaultCodespace).Result()
+	}
+	// check whether voting is completed
+	if agenda.TotalRegistered != agenda.TotalVoteComplete {
+		return types.ErrVotingIsNotFinished(types.DefaultCodespace).Result()
+	}
+
+	temp := crypto.MakeDefaultJacobianPoint()
+	vote := crypto.MakeDefaultPoint()
+	G := crypto.MakeDefaultPoint()
+
+	G.X.SetBytes(crypto.Curve.Gx.Bytes())
+	G.Y.SetBytes(crypto.Curve.Gy.Bytes())
+
+	tempCurve := crypto.MakeDefaultPoint()
+	tempCurve.X.SetBytes(crypto.Curve.Gx.Bytes())
+	tempCurve.Y.SetBytes(crypto.Curve.Gy.Bytes())
+
+	// Sum all votes
+	for i := 0; i < totalRegistered; i++ {
+		vote.X.SetString(agenda.Voters[i].Vote.X, 10)
+		vote.Y.SetString(agenda.Voters[i].Vote.Y, 10)
+
+		if i == 0 {
+			temp.X.SetBytes(vote.X.Bytes())
+			temp.Y.SetBytes(vote.Y.Bytes())
+			temp.Z = big.NewInt(1)
+		} else {
+			crypto.AddMixedM(&temp, vote)
+		}
+	}
+
+	// Each vote is represented by a G.
+	// If there are no votes... then it is 0G = (0,0)...
+	if temp.X.Cmp(big.NewInt(0)) == 0 {
+		fmt.Println("temp.X = ", temp.X)
+	} else {
+		crypto.ToZ1(&temp, crypto.Curve.P)
+
+		tempG := crypto.MakeDefaultJacobianPoint()
+		tempG.X.SetBytes(G.X.Bytes())
+		tempG.Y.SetBytes(G.Y.Bytes())
+		tempG.Z = big.NewInt(1)
+
+		// Start adding 'G' and looking for a match
+		for i := 1; i <= totalRegistered; i++ {
+			if temp.X.Cmp(tempG.X) == 0 {
+				agenda.FinalYes = i
+				agenda.FinalNo = agenda.TotalRegistered - i
+
+				agenda.State = crypto.FINISHED
+				keeper.SetAgenda(ctx, msg.AgendaTopic, agenda)
+				return sdk.Result{}
+			}
+			//tempG.X, tempG.Y = Curve.Add(tempG.X, tempG.Y, Curve.Gx, Curve.Gy)
+			crypto.AddMixedM(&tempG, G)
+			crypto.ToZ1(&tempG, crypto.Curve.P)
+		}
+	}
+	return types.ErrSomethingIsBad(types.DefaultCodespace).Result()
+
 }

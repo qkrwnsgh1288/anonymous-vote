@@ -16,8 +16,10 @@ type Agenda struct {
 	TotalRegistered   int      `json:"total_registered"`
 	TotalVoteComplete int      `json:"total_vote_complete"`
 
-	State  crypto.State `json:"state"`
-	Voters []SVoter     `json:"voter"`
+	State    crypto.State `json:"state"`
+	Voters   []SVoter     `json:"voter"`
+	FinalYes int          `json:"final_yes"`
+	FinalNo  int          `json:"final_no"`
 }
 
 func NewAgenda() Agenda {

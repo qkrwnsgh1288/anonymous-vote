@@ -17,4 +17,5 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgRegisterByVoter{}, "voteservice/MsgRegisterByVoter", nil)
 	cdc.RegisterConcrete(MsgRegisterByProposer{}, "voteservice/MsgRegisterByProposer", nil)
 	cdc.RegisterConcrete(MsgVoteAgenda{}, "voteservice/VoteAgenda", nil)
+	cdc.RegisterConcrete(MsgTally{}, "voteservice/Tally", nil)
 }
