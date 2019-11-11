@@ -14,10 +14,12 @@ const (
 	InvalidAnswer           sdk.CodeType = 104
 
 	// about zk (201 ~ 299)
-	InvalidPubkeyInCreateZKP sdk.CodeType = 201
-	InvalidVerifyZKP         sdk.CodeType = 202
-	DoesNotRegisterAddress   sdk.CodeType = 203
-	AlreadyRegisterd         sdk.CodeType = 204
+	InvalidPubkeyInCreateZKP  sdk.CodeType = 201
+	InvalidVerifyZKP          sdk.CodeType = 202
+	DoesNotRegisterAddress    sdk.CodeType = 203
+	AlreadyRegisterd          sdk.CodeType = 204
+	InvalidTotalRegisteredCnt sdk.CodeType = 205
+	DoNotHavePermission       sdk.CodeType = 206
 
 	StateIsNotSETUP      sdk.CodeType = 211
 	StateIsNotSIGNUP     sdk.CodeType = 212
@@ -52,6 +54,12 @@ func ErrDoesNotRegisterAddress(codespace sdk.CodespaceType) sdk.Error {
 }
 func ErrAlreadyRegisterd(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, AlreadyRegisterd, "This address already registered")
+}
+func ErrInvalidTotalRegisteredCnt(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, InvalidTotalRegisteredCnt, "Total registered is smaller than minimum")
+}
+func ErrDoNotHavePermission(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, DoNotHavePermission, "You don't have permission. It is only possible for the owner")
 }
 
 func ErrStateIsNotSETUP(codespace sdk.CodespaceType) sdk.Error {

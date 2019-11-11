@@ -10,6 +10,7 @@ const RouterKey = ModuleName // this was defined in your key.go file
 var (
 	_ sdk.Msg = MsgMakeAgenda{}
 	_ sdk.Msg = MsgRegisterByVoter{}
+	_ sdk.Msg = MsgRegisterByProposer{}
 	_ sdk.Msg = MsgVoteAgenda{}
 )
 
@@ -130,7 +131,36 @@ func (msg MsgRegisterByVoter) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.VoteAddr}
 }
 
-// 3. MsgVoteAgenda
+// 3. MsgRegisterByProposer
+type MsgRegisterByProposer struct {
+	AgendaTopic  string         `json:"agenda_topic"`
+	ProposerAddr sdk.AccAddress `json:"proposer_addr"`
+}
+
+func NewMsgRegisterByProposer(proposerAddr sdk.AccAddress, topic string) MsgRegisterByProposer {
+	return MsgRegisterByProposer{
+		AgendaTopic:  topic,
+		ProposerAddr: proposerAddr,
+	}
+}
+func (msg MsgRegisterByProposer) Route() string { return RouterKey }
+func (msg MsgRegisterByProposer) Type() string  { return "register_by_proposer" }
+func (msg MsgRegisterByProposer) ValidateBasic() sdk.Error {
+	// todo: more
+	if len(msg.AgendaTopic) == 0 {
+		return sdk.ErrUnknownRequest("AgendaTopic cannot be empty")
+	}
+
+	return nil
+}
+func (msg MsgRegisterByProposer) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+func (msg MsgRegisterByProposer) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.ProposerAddr}
+}
+
+// MsgVoteAgenda
 type MsgVoteAgenda struct {
 	AgendaTopic string         `json:"agenda_topic"`
 	VoteAddr    sdk.AccAddress `json:"vote_addr"`

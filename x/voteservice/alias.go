@@ -25,8 +25,9 @@ var (
 type (
 	Keeper = keeper.Keeper
 
-	MsgMakeAgenda      = types.MsgMakeAgenda
-	MsgRegisterByVoter = types.MsgRegisterByVoter
-	MsgVoteAgenda      = types.MsgVoteAgenda
-	Agenda             = types.Agenda
+	MsgMakeAgenda         = types.MsgMakeAgenda
+	MsgRegisterByVoter    = types.MsgRegisterByVoter
+	MsgRegisterByProposer = types.MsgRegisterByProposer
+	MsgVoteAgenda         = types.MsgVoteAgenda
+	Agenda                = types.Agenda
 )

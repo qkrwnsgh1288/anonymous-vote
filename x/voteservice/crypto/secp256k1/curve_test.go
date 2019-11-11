@@ -41,6 +41,15 @@ func TestAdd2(t *testing.T) {
 	a, b, c := theCurve.addJacobian(x, y, z, x1, y1, z1)
 	fmt.Println(a, b, c)
 }
+func TestSub(t *testing.T) {
+	x := big.NewInt(1)
+	x1 := common.GetBigInt("30061975807968526978116138222528932566686537412871265156620434532445965483942", 10)
+	x2 := common.GetBigInt("98141067444202828032016841245494455215374046124323329249557735915756843740538", 10)
+	x.Sub(x2, x1)
+	a := new(big.Int).Sub(x2, x1).String()
+	fmt.Println(x)
+	fmt.Println(a)
+}
 
 func TestDouble(t *testing.T) {
 	inputA := big.NewInt(1) //common.GetBigInt("1", 10)

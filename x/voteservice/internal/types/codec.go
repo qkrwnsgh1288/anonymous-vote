@@ -15,5 +15,6 @@ func init() {
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgMakeAgenda{}, "voteservice/MakeAgenda", nil)
 	cdc.RegisterConcrete(MsgRegisterByVoter{}, "voteservice/MsgRegisterByVoter", nil)
+	cdc.RegisterConcrete(MsgRegisterByProposer{}, "voteservice/MsgRegisterByProposer", nil)
 	cdc.RegisterConcrete(MsgVoteAgenda{}, "voteservice/VoteAgenda", nil)
 }

@@ -25,12 +25,14 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	nameserviceTxCmd.AddCommand(client.PostCommands(
 		GetCmdMakeAgenda(cdc),
 		GetCmdRegisterByVoter(cdc),
+		GetCmdRegisterByProposer(cdc),
 		GetCmdVoteAgenda(cdc),
 	)...)
 
 	return nameserviceTxCmd
 }
 
+// 1. MsgMakeAgenda
 func GetCmdMakeAgenda(cdc *codec.Codec) *cobra.Command {
 	var whiteList []string
 	c := &cobra.Command{
@@ -52,6 +54,8 @@ func GetCmdMakeAgenda(cdc *codec.Codec) *cobra.Command {
 
 	return c
 }
+
+// 2. MsgRegisterByVoter
 func GetCmdRegisterByVoter(cdc *codec.Codec) *cobra.Command {
 	c := &cobra.Command{
 		Use:   "register-by-voter [topic] [file_path]",
@@ -67,6 +71,26 @@ func GetCmdRegisterByVoter(cdc *codec.Codec) *cobra.Command {
 			}
 
 			msg := types.NewMsgRegisterByVoter(cliCtx.GetFromAddress(), args[0], zkSlice)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+	return c
+}
+
+// 3. MsgRegisterByProposer
+func GetCmdRegisterByProposer(cdc *codec.Codec) *cobra.Command {
+	c := &cobra.Command{
+		Use:   "register-by-proposer [topic]",
+		Short: "final registration by proposer",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			msg := types.NewMsgRegisterByProposer(cliCtx.GetFromAddress(), args[0])
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
