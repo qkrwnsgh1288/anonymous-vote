@@ -5,8 +5,8 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/crypto/secp256k1"
 	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/common"
-	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/crypto/secp256k1"
 	"golang.org/x/crypto/sha3"
 	"math/big"
 )
@@ -114,7 +114,7 @@ func CreateZKP(senderAddr string, x, v *big.Int, xG Point) (r *big.Int, vG Jacob
 	// Get g^{v}
 	// Convert to Affine Co-ordinates
 	vG.X, vG.Y = Curve.ScalarBaseMult(v.Bytes())
-	vG.Z = secp256k1.ZForAffine(vG.X, vG.Y)
+	vG.Z = ZForAffine(vG.X, vG.Y)
 
 	// Get c = H(g, g^{x}, g^{v});
 	hash := sha256.New()

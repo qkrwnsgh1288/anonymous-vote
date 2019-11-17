@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/cosmos/cosmos-sdk v0.37.0
+	github.com/ethereum/go-ethereum v1.9.7
 	github.com/go-logfmt/logfmt v0.4.0 // indirect
 	github.com/gorilla/mux v1.7.0
 	github.com/mattn/go-isatty v0.0.7 // indirect

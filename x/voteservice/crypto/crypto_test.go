@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/common"
-	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice/crypto/secp256k1"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -105,7 +104,7 @@ func TestIsOnCurve(t *testing.T) {
 func TestVG(t *testing.T) {
 	var vG JacobianPoint
 	vG.X, vG.Y = Curve.ScalarBaseMult(vote1ZK.V.Bytes())
-	vG.Z = secp256k1.ZForAffine(vG.X, vG.Y)
+	vG.Z = ZForAffine(vG.X, vG.Y)
 
 	assert.Equal(t, "37002400596499253347436146477359872208984972423528869527866238051389129979940", vG.X.String())
 	assert.Equal(t, "46104438919360535329359949165853481514194123783534889415421577162302988165861", vG.Y.String())
@@ -165,7 +164,7 @@ func TestSha256(t *testing.T) {
 
 	var vG JacobianPoint
 	vG.X, vG.Y = Curve.ScalarBaseMult(vote1ZK.V.Bytes())
-	vG.Z = secp256k1.ZForAffine(vG.X, vG.Y)
+	vG.Z = ZForAffine(vG.X, vG.Y)
 
 	hashInput := sender.Bytes()
 	hashInput = append(hashInput, Curve.Gx.Bytes()...)
@@ -218,7 +217,7 @@ func TestCreateZKP(t *testing.T) {
 func TestIsOnCurveVG(t *testing.T) {
 	var vG JacobianPoint
 	vG.X, vG.Y = Curve.ScalarBaseMult(vote1ZK.V.Bytes())
-	vG.Z = secp256k1.ZForAffine(vG.X, vG.Y)
+	vG.Z = ZForAffine(vG.X, vG.Y)
 
 	assert.Equal(t, "37002400596499253347436146477359872208984972423528869527866238051389129979940", vG.X.String())
 	assert.Equal(t, "46104438919360535329359949165853481514194123783534889415421577162302988165861", vG.Y.String())
@@ -235,7 +234,7 @@ func TestVerifyZKP(t *testing.T) {
 
 	var vG JacobianPoint
 	vG.X, vG.Y = Curve.ScalarBaseMult(vote1ZK.V.Bytes())
-	vG.Z = secp256k1.ZForAffine(vG.X, vG.Y)
+	vG.Z = ZForAffine(vG.X, vG.Y)
 
 	res := VerifyZKP(senderAddr, vote1ZK.XG, r, vG)
 	assert.True(t, res)
