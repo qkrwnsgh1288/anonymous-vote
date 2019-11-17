@@ -4,7 +4,7 @@ This is the anonymous voting project using cosmos-sdk.
 Up to now, implementation of the agenda and voting has been completed, but the anonymous system is being implemented.(not yet)
 
 
-###[go installation guide ](./docs/install_guide.md)
+### [go installation guide ](./docs/install_guide.md)
 
 
 
