@@ -36,7 +36,7 @@ func main() {
 
 	rootCmd := &cobra.Command{
 		Use:               "voted",
-		Short:             "jh-voteservice App Daemon (server)",
+		Short:             "voteservice App Daemon (server)",
 		PersistentPreRunE: server.PersistentPreRunEFn(ctx),
 	}
 	// CLI commands to initialize the chain

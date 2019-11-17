@@ -28,7 +28,7 @@ import (
 	"github.com/qkrwnsgh1288/anonymous-vote/x/voteservice"
 )
 
-const appName = "jh-voteservice"
+const appName = "voteservice"
 
 var (
 	// default home directories for the application CLI

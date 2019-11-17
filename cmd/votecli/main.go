@@ -33,7 +33,7 @@ func main() {
 
 	rootCmd := &cobra.Command{
 		Use:   "votecli",
-		Short: "jh-voteservice Client",
+		Short: "voteservice Client",
 	}
 
 	// Add --chain-id to persistent flags and mark it required
