@@ -191,6 +191,6 @@ ideas:
     - Each message consists of yes or no for one
     - If one voter casts a yes vote, it automatically sets no to other messages.
 <br><br>
-- There is currently one vulnerability to this voting system. The final voter can check the results before tally through a voting simulation.
+- There is currently one vulnerability to this voting system. The final voter can check the results before tally through a voting simulation.<br>
 ideas:
     - The final vote must be made available to the proposer only
