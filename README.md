@@ -181,3 +181,16 @@ votecli query voteservice agenda "test1"
 }
 ```
 You can see result. (yes: 2, no: 1)
+
+Things to improve
+================
+
+- Allow more than just "yes" or "no" as voting options like number 1, 2, 3, 4 ....<br>
+ideas:
+    - Unify multiple voting messages into one vote
+    - Each message consists of yes or no for one
+    - If one voter casts a yes vote, it automatically sets no to other messages.
+<br><br>
+- There is currently one vulnerability to this voting system. The final voter can check the results before tally through a voting simulation.
+ideas:
+    - The final vote must be made available to the proposer only
