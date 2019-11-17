@@ -7,7 +7,11 @@ And It is made non-interactive using the Fiat-Shamir heuristic (A. Fiat and A. S
 <br><br>
 I referenced here
 - http://fc17.ifca.ai/preproceedings/paper_80.pdf
-- https://github.com/stonecoldpat/anonymousvoting
+- https://github.com/stonecoldpat/anonymousvoting (Schnorr NIZK)
+- https://github.com/mgenware/go-modular-exponentiation (for modular calc)
+- library "github.com/ethereum/go-ethereum/crypto/secp256k1"
+<br>
+##### I really appreciate the reference providers listed above.
 
 ### [go installation guide ](./docs/install_guide.md)
 
