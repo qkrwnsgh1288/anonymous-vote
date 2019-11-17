@@ -72,6 +72,7 @@ func handleMsgRegisterByVoter(ctx sdk.Context, keeper Keeper, msg MsgRegisterByV
 	addr := msg.VoteAddr.String()
 
 	// createZKP
+	// todo: It should consider calling CreateZKP on the front-end and verifying only here.
 	v1_r, v1_vG, err := crypto.CreateZKP(addr, zkInfo.X, zkInfo.V, zkInfo.XG)
 	if err != nil {
 		return types.ErrInvalidPubkeyInCreateZKP(types.DefaultCodespace).Result()
@@ -227,6 +228,7 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 
 			switch msg.YesOrNo {
 			case "yes":
+				// todo: It should consider calling Create1outof2ZKPYesVote on the front-end and verifying only here.
 				y, a1, b1, a2, b2, params, _ := crypto.Create1outof2ZKPYesVote(addr, xG, yG, zkInfo.W, zkInfo.R, zkInfo.D, zkInfo.X)
 				if !crypto.Verify1outof2ZKP(addr, params, xG, yG, y, a1, b1, a2, b2) {
 					return types.ErrInvalidVerify1outof2ZKP(types.DefaultCodespace).Result()
@@ -237,6 +239,7 @@ func handleMsgVoteAgenda(ctx sdk.Context, keeper Keeper, msg MsgVoteAgenda) sdk.
 				agenda.Voters[i].Commitment = crypto.CommitToVote(addr, params, xG, yG, y, a1, b1, a2, b2)
 				agenda.Voters[i].Vote = types.GetSPointFromPoint(y)
 			case "no":
+				// todo: It should consider calling Create1outof2ZKPNoVote on the front-end and verifying only here.
 				y, a1, b1, a2, b2, params, _ := crypto.Create1outof2ZKPNoVote(addr, xG, yG, zkInfo.W, zkInfo.R, zkInfo.D, zkInfo.X)
 				if !crypto.Verify1outof2ZKP(addr, params, xG, yG, y, a1, b1, a2, b2) {
 					return types.ErrInvalidVerify1outof2ZKP(types.DefaultCodespace).Result()

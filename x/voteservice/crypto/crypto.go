@@ -200,8 +200,7 @@ func VerifyZKP(senderAddr string, xG Point, r *big.Int, vG JacobianPoint) bool {
 // Called by participants to register their voting public key
 // Participant mut be eligible, and can only register the first key sent key.
 func Register(senderAddr string, xG Point, vG JacobianPoint, r *big.Int) error {
-	// todo:  dead line check
-	// todo: white list check
+	// todo: have to module
 	Voters = append(Voters, MakeVoter(senderAddr, xG))
 	//Voters[Totalregistered] = MakeVoter(senderAddr, XG)
 	Totalregistered += 1
@@ -211,6 +210,7 @@ func Register(senderAddr string, xG Point, vG JacobianPoint, r *big.Int) error {
 
 // Calculate the reconstructed keys
 func FinishRegistrationPhase() error {
+	// todo: have to module
 	if Totalregistered < 3 {
 		return errors.New("total registered is smaller than minimum(3)")
 	}
