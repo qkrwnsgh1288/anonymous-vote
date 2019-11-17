@@ -1,6 +1,10 @@
 # Anonymous-vote
 
-This is the anonymous voting project using cosmos-sdk.
+This is the anonymous voting project using cosmos-sdk.<br>
+It is implemented using Schnorr Zero Knowledge Proof based on Claude P. Schnorr, "Efficient signature generation by smart cards", Journal of Cryptology, Vo. 4, No. 3, pp. 161–174, 1991.
+<br>
+And It is made non-interactive using the Fiat-Shamir heuristic (A. Fiat and A. Shamir. How to prove yourself: Practical solutions to identification and signature problems. In A. M. Odlyzko, editor, Crypto’86, volume 263 of LNCS, pages 186–194. Springer, 1987.)
+<br><br>
 I referenced here
 - http://fc17.ifca.ai/preproceedings/paper_80.pdf
 - https://github.com/stonecoldpat/anonymousvoting
@@ -30,7 +34,7 @@ Each step description
 
 Tutorial sample
 ================
-### init setting
+### Init vote node setting
 ```shell
 # 1. You can see '$GOPATH/go/projects/.voted' default directory after executing under command
 voted init test_node --chain-id test_votechain
@@ -64,7 +68,7 @@ voted validate-genesis
 voted start
 ```
 
-### create voting code
+### Create voting code
 ```shell
 # Each voter has to have voting codes (zk_file).
 java -jar votingcodes.jar
@@ -73,7 +77,7 @@ mv voter.txt voter_1.txt
 ....
 ```
 
-### voting sample
+### Voting
 ```shell
 # 1. make-agenda ([topic] [content] --whitelist address,address...)
 votecli tx voteservice make-agenda "test1" "Do you want to eat lunch?" --from jack \
