@@ -11,7 +11,7 @@ I referenced here
 - https://github.com/mgenware/go-modular-exponentiation (for modular calc)
 - library "github.com/ethereum/go-ethereum/crypto/secp256k1"
 <br>
-##### I really appreciate the reference providers listed above.
+#####I really appreciate the reference providers listed above.
 
 ### [go installation guide ](./docs/install_guide.md)
 
