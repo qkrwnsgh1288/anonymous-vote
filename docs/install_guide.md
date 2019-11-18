@@ -13,8 +13,8 @@ echo "export PATH=\$GOBIN:\$GOROOT/bin:\$PATH" >> ~/.profile
 echo "export GO111MODULE=on" >> ~/.profile
 source ~/.profile
 
-# install dep (If you does not exist)
-curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+# install dep (If you does not exist) (currently not use)
+## curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 ```
 
 ### Get Source Code & Compile
