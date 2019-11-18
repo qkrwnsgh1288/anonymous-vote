@@ -199,5 +199,6 @@ ideas:
 ideas:
     - The final vote must be made available to the proposer only
 <p>
-If you have any other questions about this project, please contact me (qkrwnsgh1288@daum.net)
+If you have any other questions about this project, please contact me <br>
+(<a href="qkrwnsgh1288@daum.net">qkrwnsgh1288@daum.net</a>)
 </p>
