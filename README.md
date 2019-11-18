@@ -1,6 +1,6 @@
 # Anonymous-vote
 
-This is the anonymous voting project using cosmos-sdk.<br>
+This is the anonymous voting project using cosmos-sdk. (POC)<br>
 It is implemented using Schnorr Zero Knowledge Proof based on Claude P. Schnorr, "Efficient signature generation by smart cards", Journal of Cryptology, Vo. 4, No. 3, pp. 161–174, 1991.
 <br>
 And It is made non-interactive using the Fiat-Shamir heuristic (A. Fiat and A. Shamir. How to prove yourself: Practical solutions to identification and signature problems. In A. M. Odlyzko, editor, Crypto’86, volume 263 of LNCS, pages 186–194. Springer, 1987.)
