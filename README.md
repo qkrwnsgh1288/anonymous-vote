@@ -45,7 +45,7 @@ Tutorial sample
 # 1. You can see '$GOPATH/go/projects/.voted' default directory after executing under command
 voted init test_node --chain-id test_votechain
 
-# 2. Create account (If you want more, you can crete) (Remember account password)
+# 2. Create account (Remember account password) (If you want more, you can create later) 
 votecli keys add jack
 votecli keys add alice
 votecli keys add other
