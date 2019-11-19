@@ -2,7 +2,7 @@
 The current voting system is implemented as a single web server. This assumes trust.
 However, <u>if blockchain is used, electronic voting system is possible **based on trust** rather than assuming trust.</u> And here, my voting information is not exposed on the public bulletin board, so <b>secret ballot</b> is possible.<br>
 So I developed it based on blockchain using cosmos-sdk. (POC)<br><br>
-It is implemented using Schnorr Zero Knowledge Proof based on Claude P. <u>Schnorr</u>, "Efficient signature generation by smart cards", Journal of Cryptology, Vo. 4, No. 3, pp. 161–174, 1991.
+It is implemented using Schnorr Zero Knowledge Proof based on Claude P. *Schnorr*, "Efficient signature generation by smart cards", Journal of Cryptology, Vo. 4, No. 3, pp. 161–174, 1991.
 <br>
 And It is made non-interactive using the Fiat-Shamir heuristic (A. Fiat and A. Shamir. How to prove yourself: Practical solutions to identification and signature problems. In A. M. Odlyzko, editor, Crypto’86, volume 263 of LNCS, pages 186–194. Springer, 1987.)
 <br><br>
