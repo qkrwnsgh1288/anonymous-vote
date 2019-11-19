@@ -1,0 +1,34 @@
+{
+  "type": "cosmos-sdk/StdTx",
+  "value": {
+    "msg": [
+      {
+        "type": "cosmos-sdk/MsgSend",
+        "value": {
+          "from_address": "cosmos152galq9j5764sggk85z504k50xuq788f9ua85f",
+          "to_address": "cosmos1c8mpkaztknquuvfu2lt34939nzgzkg4q799kf3",
+          "amount": [
+            {
+              "denom": "votetoken",
+              "amount": "1"
+            }
+          ]
+        }
+      }
+    ],
+    "fee": {
+      "amount": [],
+      "gas": "200000"
+    },
+    "signatures": [
+      {
+        "pub_key": {
+          "type": "tendermint/PubKeySecp256k1",
+          "value": "A4Q52XLNnl0KvN8AcqTM9MBDWaR/YszSwfhEsK3kTenS"
+        },
+        "signature": "+A3XlcZpassognYG8S4eZK4xwIRhhv2rmgMn/3GUxUxygDroxUUpFcL4myC99ASHkzn3QFAf93wXDyC5RXAjTA=="
+      }
+    ],
+    "memo": ""
+  }
+}

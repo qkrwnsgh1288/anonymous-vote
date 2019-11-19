@@ -1,0 +1,27 @@
+{
+    "type": "cosmos-sdk/StdTx",
+    "value": {
+        "msg": [
+            {
+                "type": "voteservice/MakeAgenda",
+                "value": {
+                    "agenda_proposer": "cosmos152galq9j5764sggk85z504k50xuq788f9ua85f",
+                    "agenda_topic": "test21",
+                    "agenda_content": "Is ths test?",
+                    "whitelist": [
+                        "cosmos1c8mpkaztknquuvfu2lt34939nzgzkg4q799kf3",
+                        "cosmos152galq9j5764sggk85z504k50xuq788f9ua85f",
+                        "cosmos1ed3mttdadlc2xwf7ac98ptrt7kg274uswlj900"
+                    ],
+                    "voter": null
+                }
+            }
+        ],
+        "fee": {
+            "amount": [],
+            "gas": "200000"
+        },
+        "signatures": null,
+        "memo": ""
+    }
+}

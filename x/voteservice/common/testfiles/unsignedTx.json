@@ -1,0 +1,26 @@
+{
+    "type": "cosmos-sdk/StdTx",
+    "value": {
+        "msg": [
+            {
+                "type": "cosmos-sdk/MsgSend",
+                "value": {
+                    "from_address": "cosmos152galq9j5764sggk85z504k50xuq788f9ua85f",
+                    "to_address": "cosmos1c8mpkaztknquuvfu2lt34939nzgzkg4q799kf3",
+                    "amount": [
+                        {
+                            "denom": "votetoken",
+                            "amount": "1"
+                        }
+                    ]
+                }
+            }
+        ],
+        "fee": {
+            "amount": [],
+            "gas": "200000"
+        },
+        "signatures": null,
+        "memo": ""
+    }
+}
